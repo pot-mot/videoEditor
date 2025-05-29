@@ -18,7 +18,6 @@ qt_add_executable(videoEditor
     mainwindow.ui
 
     imageprocessor.h imageprocessor.cpp
-    scrollareahelper.h scrollareahelper.cpp
 )
 
 target_include_directories(videoEditor
