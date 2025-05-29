@@ -35,6 +35,7 @@ private:
     void initUI();
 
     void openImage();
+    void exportImage();
     void setImage(const QImage& image);
     void resetImage();
 };

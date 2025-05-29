@@ -61,6 +61,10 @@ void ImageEditor::initUI() {
     connect(openAction, &QAction::triggered, this, &ImageEditor::openImage);
     toolBar->addAction(openAction);
 
+    QAction* exportAction = new QAction(tr("导出图片"), this);
+    connect(exportAction, &QAction::triggered, this, &ImageEditor::exportImage);
+    toolBar->addAction(exportAction);
+
     QAction* resetAction = new QAction(tr("初始化"), this);
     connect(resetAction, &QAction::triggered, this, &ImageEditor::resetImage);
     toolBar->addAction(resetAction);
@@ -145,4 +149,30 @@ void ImageEditor::setImage(const QImage& image) {
         Qt::SmoothTransformation
         );
     imageLabel->setPixmap(QPixmap::fromImage(scaledImage));
+}
+
+void ImageEditor::exportImage() {
+    if (this->currentImage.isNull()) {
+        QMessageBox::warning(this, tr("警告"), tr("没有可导出的图片"));
+        return;
+    }
+
+    QString savePath = QFileDialog::getSaveFileName(
+        this,
+        tr("保存图片"),
+        "",
+        tr("PNG 文件 (*.png);;JPEG 文件 (*.jpg);;BMP 文件 (*.bmp)"));
+
+    if (!savePath.isEmpty()) {
+        // 自动补充文件扩展名
+        QFileInfo fileInfo(savePath);
+        QString suffix = fileInfo.suffix().toLower();
+        if (suffix.isEmpty()) {
+            savePath += ".png";  // 默认使用 PNG 格式
+        }
+
+        if (!this->currentImage.save(savePath)) {
+            QMessageBox::warning(this, tr("错误"), tr("图片保存失败"));
+        }
+    }
 }
