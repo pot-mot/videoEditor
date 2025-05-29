@@ -6,6 +6,7 @@
 #include <QSlider>
 #include <QImage>
 #include <QPixmap>
+#include "commandhistory.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,16 +25,19 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+
+    CommandHistory commandHistory;
+
     QLabel* imageLabel;
     QSlider* thresholdSlider;
     QSlider* scaleSlider;
     QImage originImage;
+    QImage currentImage;
 
     void initUI();
     void showAboutDialog();
 
     void openImage();
-    QImage getCurrentImage();
     void setImage(const QImage& image);
     void resetImage();
 };

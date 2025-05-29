@@ -18,6 +18,7 @@ qt_add_executable(videoEditor
     mainwindow.ui
 
     imageprocessor.h imageprocessor.cpp
+    commandhistory.h commandhistory.cpp
 )
 
 target_include_directories(videoEditor

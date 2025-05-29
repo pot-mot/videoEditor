@@ -27,11 +27,10 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
 void MainWindow::initUI() {
     // 创建 QScrollArea 并设置为中央部件
     QScrollArea* scrollArea = new QScrollArea(this);
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     scrollArea->setWidgetResizable(true); // 图片随滚动区域缩放
 
     scrollArea->viewport()->setAttribute(Qt::WA_AcceptTouchEvents);
@@ -59,13 +58,7 @@ void MainWindow::initUI() {
     scaleSlider->setValue(100);
     scaleToolBar->addWidget(scaleSlider);
     connect(scaleSlider, &QSlider::valueChanged, this, [this]() {
-        qreal scaleFactor = scaleSlider->value() / 100.0;
-        QImage scaledImage = this->originImage.scaled(
-            this->originImage.size() * scaleFactor,
-            Qt::KeepAspectRatio,
-            Qt::SmoothTransformation
-            );
-        this->setImage(scaledImage);
+        this->setImage(this->currentImage);
     });
 
     QMenu* fileMenu = menuBar->addMenu(tr("文件"));
@@ -82,37 +75,39 @@ void MainWindow::initUI() {
 
     QAction* grayscaleAction = processMenu->addAction(tr("灰度化"));
     connect(grayscaleAction, &QAction::triggered, this, [this]() {
-        this->setImage(ImageProcessor::grayscaleImage(this->getCurrentImage()));
+        this->setImage(ImageProcessor::grayscaleImage(this->currentImage));
     });
     toolBar->addAction(grayscaleAction);
 
     QAction* binarizeAction = processMenu->addAction(tr("二值化"));
     connect(binarizeAction, &QAction::triggered, this, [this]() {
-        this->setImage(ImageProcessor::binarizeImage(this->getCurrentImage(), this->thresholdSlider->value()));
+        this->setImage(ImageProcessor::binarizeImage(this->currentImage, this->thresholdSlider->value()));
     });
     toolBar->addAction(binarizeAction);
-    thresholdSlider = new QSlider(Qt::Horizontal, this);
+    thresholdSlider = new QSlider(Qt::Horizontal);
+    thresholdSlider->setFixedWidth(128);
     thresholdSlider->setRange(0, 255);
-    thresholdSlider->setValue(128);
+    thresholdSlider->setValue(127);
     connect(thresholdSlider, &QSlider::valueChanged, this, [this]() {
-        this->setImage(ImageProcessor::binarizeImage(this->getCurrentImage(), this->thresholdSlider->value()));
+        this->setImage(ImageProcessor::binarizeImage(this->currentImage, this->thresholdSlider->value()));
     });
+    toolBar->addWidget(thresholdSlider);
 
     QAction* meanFilterAction = processMenu->addAction(tr("3x3均值滤波"));
     connect(meanFilterAction, &QAction::triggered, this, [this]() {
-        this->setImage(ImageProcessor::meanFilterImage(this->getCurrentImage()));
+        this->setImage(ImageProcessor::meanFilterImage(this->currentImage));
     });
     toolBar->addAction(meanFilterAction);
 
     QAction* gammaCorrectionAction = processMenu->addAction(tr("伽马变换"));
     connect(gammaCorrectionAction, &QAction::triggered, this, [this]() {
-        this->setImage(ImageProcessor::gammaCorrection(this->getCurrentImage()));
+        this->setImage(ImageProcessor::gammaCorrection(this->currentImage));
     });
     toolBar->addAction(gammaCorrectionAction);
 
     QAction* edgeDetectionAction = processMenu->addAction(tr("边缘检测"));
     connect(edgeDetectionAction, &QAction::triggered, this, [this]() {
-        this->setImage(ImageProcessor::edgeDetection(this->getCurrentImage()));
+        this->setImage(ImageProcessor::edgeDetection(this->currentImage));
     });
     toolBar->addAction(edgeDetectionAction);
 
@@ -124,6 +119,7 @@ void MainWindow::openImage() {
     QString imagePath = QFileDialog::getOpenFileName(this, tr("打开图片"), "", tr("Image Files (*.png *.jpg *.bmp)"));
     if (!imagePath.isEmpty()) {
         this->originImage = QImage(imagePath);
+        this->currentImage = this->originImage;
 
         QSize windowSize = this->size();
         QSize targetSize = windowSize * 0.7;
@@ -136,29 +132,32 @@ void MainWindow::openImage() {
     }
 }
 
-QImage MainWindow::getCurrentImage() {
-    return this->imageLabel->pixmap().toImage();
-}
-
 void MainWindow::resetImage() {
     if (this->originImage.isNull()) {
         QMessageBox::warning(this, tr("警告"), tr("未打开图片"));
         return;
     }
 
+    this->currentImage = this->originImage;
+    this->setImage(this->currentImage);
+}
+
+void MainWindow::setImage(const QImage& image) {
+    if (image.isNull()) {
+        QMessageBox::warning(this, tr("警告"), tr("图片不存在"));
+        return;
+    }
+
+    this->currentImage = image;
     qreal scaleFactor = scaleSlider->value() / 100.0;
-    QImage scaledImage = this->originImage.scaled(
+    QImage scaledImage = image.scaled(
         this->originImage.size() * scaleFactor,
         Qt::KeepAspectRatio,
         Qt::SmoothTransformation
         );
-    this->setImage(scaledImage);
-}
-
-void MainWindow::setImage(const QImage& image) {
-    imageLabel->setPixmap(QPixmap::fromImage(image));
+    imageLabel->setPixmap(QPixmap::fromImage(scaledImage));
 }
 
 void MainWindow::showAboutDialog() {
-    QMessageBox::about(this, tr("关于"), tr("数字图像处理软件V1.0\n作者：李钺\n学号：249400220"));
+    QMessageBox::about(this, tr("关于"), tr("imageVideoEditorV1.0\n作者：李钺\n学号：249400220"));
 }

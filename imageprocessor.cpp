@@ -67,24 +67,39 @@ QImage ImageProcessor::gammaCorrection(const QImage& baseImage) {
 }
 
 QImage ImageProcessor::edgeDetection(const QImage& baseImage) {
-    QImage image = baseImage.copy();
-    int sobelX[3][3] = {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}};
-    int sobelY[3][3] = {{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}};
-    for (int y = 1; y < image.height() - 1; ++y) {
-        for (int x = 1; x < image.width() - 1; ++x) {
+    QImage grayImage = grayscaleImage(baseImage);
+    QImage edgeImage(grayImage.size(), QImage::Format_ARGB32);
+
+    // Sobel算子核
+    int sobelX[3][3] = {
+        {-1, 0, 1},
+        {-2, 0, 2},
+        {-1, 0, 1}
+    };
+    int sobelY[3][3] = {
+        {-1, -2, -1},
+        {0, 0, 0},
+        {1, 2, 1}
+    };
+
+    for (int y = 1; y < grayImage.height() - 1; ++y) {
+        for (int x = 1; x < grayImage.width() - 1; ++x) {
             int gx = 0, gy = 0;
+
             for (int i = -1; i <= 1; ++i) {
                 for (int j = -1; j <= 1; ++j) {
-                    QColor color = QColor(image.pixel(x + i, y + j));
-                    int gray = (color.red() + color.green() + color.blue()) / 3;
-                    gx += gray * sobelX[i + 1][j + 1];
-                    gy += gray * sobelY[i + 1][j + 1];
+                    int pixel = qGray(grayImage.pixel(x + i, y + j));
+                    gx += pixel * sobelX[i + 1][j + 1];
+                    gy += pixel * sobelY[i + 1][j + 1];
                 }
             }
-            int edge = std::sqrt(gx * gx + gy * gy);
-            edge = std::min(edge, 255);
-            image.setPixel(x, y, QColor(edge, edge, edge).rgb());
+
+            int magnitude = static_cast<int>(std::sqrt(gx * gx + gy * gy));
+            magnitude = std::min(magnitude, 255);
+
+            edgeImage.setPixel(x, y, qRgb(magnitude, magnitude, magnitude));
         }
     }
-    return image;
+
+    return edgeImage;
 }
