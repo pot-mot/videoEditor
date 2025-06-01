@@ -27,6 +27,10 @@ public:
     // 根据文件名关键字搜索文件
     void searchFiles(const QString &keyword);
 
+signals:
+    void fileSelected(const QString &filePath);
+
+
 private:
     Ui::FileViewer *ui;
     QPushButton *selectDirButton;
@@ -40,6 +44,8 @@ private slots:
     void onSelectBaseDir();
 
     void onFilterTextChanged(const QString &text);
+
+    void onTreeWidgetItemClicked(QTreeWidgetItem *item, int column);
 };
 
 #endif // FILEVIEWER_H

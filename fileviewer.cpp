@@ -26,6 +26,7 @@ FileViewer::FileViewer(QWidget *parent) :
     treeWidget = new QTreeWidget(this);
     treeWidget->setMinimumWidth(150);
     treeWidget->setHeaderLabel("文件列表");
+    connect(treeWidget, &QTreeWidget::itemClicked, this, &FileViewer::onTreeWidgetItemClicked);
     layout->addWidget(treeWidget); // 将树形控件添加到布局
 
     // 设置布局
@@ -57,11 +58,13 @@ void FileViewer::loadDirectory(const QDir &dir, QTreeWidgetItem *parentItem, con
     for (const QFileInfo &entry : entries) {
         if (parentItem == nullptr) {
             QTreeWidgetItem *item = new QTreeWidgetItem(treeWidget, QStringList(entry.fileName()));
+            item->setData(0, Qt::UserRole, entry.absoluteFilePath());
             if (entry.isDir()) {
                 loadDirectory(QDir(entry.absoluteFilePath()), item, filters);
             }
         } else if (entry.isFile() && filters.contains(entry.suffix())) {
             QTreeWidgetItem *item = new QTreeWidgetItem(parentItem, QStringList(entry.fileName()));
+            item->setData(0, Qt::UserRole, entry.absoluteFilePath());
             if (entry.isDir()) {
                 loadDirectory(QDir(entry.absoluteFilePath()), item, filters);
             }
@@ -101,5 +104,19 @@ void FileViewer::onFilterTextChanged(const QString &text) {
             (*it)->setHidden(true);
         }
         ++it;
+    }
+}
+
+void FileViewer::onTreeWidgetItemClicked(QTreeWidgetItem *item, int column) {
+    Q_UNUSED(column); // 忽略列参数
+
+    if (item && !item->childCount()) { // 确保是叶子节点
+        QString filePath = item->data(0, Qt::UserRole).toString(); // 获取文件路径
+        QFileInfo fileInfo(filePath);
+        QString suffix = fileInfo.suffix();
+
+        if (!filePath.isEmpty() && this->typeFilters.contains(suffix)) {
+            emit fileSelected(filePath); // 发射信号
+        }
     }
 }
