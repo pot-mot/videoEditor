@@ -14,6 +14,9 @@ public:
     qreal getVolume() const { return volume; }
     const QString &getExternalEffect() const { return externalEffect; }
 
+    void setVolume(qreal value) { volume = value; }
+    void setExternalEffect(const QString &effect) { externalEffect = effect; }
+
 private:
     qreal volume;               // 响度
     QString externalEffect;     // 外部效果

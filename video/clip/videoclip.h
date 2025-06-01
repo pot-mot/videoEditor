@@ -2,6 +2,7 @@
 #define VIDEOCLIP_H
 
 #include "clipbase.h"
+#include <QRect>
 
 // 视频切片类，继承自 Clip
 class VideoClip : public Clip {
@@ -14,6 +15,10 @@ public:
     const QRect &getDisplayArea() const { return displayArea; }
     qreal getOpacity() const { return opacity; }
     const QString &getExternalEffect() const { return externalEffect; }
+
+    void setDisplayArea(const QRect &area) { displayArea = area; }
+    void setOpacity(qreal value) { opacity = value; }
+    void setExternalEffect(const QString &effect) { externalEffect = effect; }
 
 private:
     QRect displayArea;          // 显示区域

@@ -40,6 +40,7 @@ qt_add_executable(videoEditor
         video/clip/imageclip.h
         video/clip/audioclip.h
         video/clip/videoclip.h
+        video/clip/textclip.h
 )
 
 target_include_directories(videoEditor
