@@ -25,7 +25,7 @@ private:
 
     void initUI();
 
-    QTreeWidget *fileResourceList;
+    QTreeWidget *fileResourceTree;
     QVideoWidget *videoPreview;
     QSlider *mainTimeline;
     QSlider *sliceTimeline;

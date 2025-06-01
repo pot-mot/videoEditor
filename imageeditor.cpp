@@ -6,16 +6,11 @@
 #include <QPixmap>
 #include <QSlider>
 #include <QMessageBox>
-#include <QMenuBar>
 #include <QToolBar>
 #include <QAction>
 #include <QImage>
-#include <QColor>
 #include <QScrollArea>
 #include <QScroller>
-#include <QDebug>
-#include <QVBoxLayout>
-#include <QSizePolicy>
 #include "imageprocessor.h"
 
 ImageEditor::ImageEditor(QWidget *parent)
@@ -84,9 +79,6 @@ void ImageEditor::initUI() {
     thresholdSlider->setFixedWidth(128);
     thresholdSlider->setRange(0, 255);
     thresholdSlider->setValue(127);
-    connect(thresholdSlider, &QSlider::valueChanged, this, [this]() {
-        this->setImage(ImageProcessor::binarizeImage(this->currentImage, this->thresholdSlider->value()));
-    });
     toolBar->addWidget(thresholdSlider);
 
     QAction* meanFilterAction = new QAction(tr("3x3均值滤波"), this);

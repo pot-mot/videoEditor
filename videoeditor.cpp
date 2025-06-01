@@ -29,9 +29,6 @@ void VideoEditor::initUI()
     fileResourceTree = new QTreeWidget(this);
     fileResourceTree->setHeaderLabel("文件资源");
     leftLayout->addWidget(fileResourceTree);
-    connect(fileResourceList, &QListWidget::itemClicked, this, [this](QListWidgetItem *item) {
-        qDebug() << "File selected:" << item->text();
-    });
 
     // 中间栏 (3)
     QWidget *middleContainer = new QWidget(this);

@@ -1,7 +1,6 @@
 #ifndef COMMANDHISTORY_H
 #define COMMANDHISTORY_H
 
-#include <QString>
 #include <stack>
 #include <QHash>
 

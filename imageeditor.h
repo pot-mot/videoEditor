@@ -6,7 +6,6 @@
 #include <QLabel>
 #include <QSlider>
 #include <QImage>
-#include <QPixmap>
 
 namespace Ui {
 class ImageEditor;
