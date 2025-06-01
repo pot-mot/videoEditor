@@ -7,7 +7,6 @@
 #include <QSlider>
 #include <QImage>
 #include <QPixmap>
-#include "commandhistory.h"
 
 namespace Ui {
 class ImageEditor;
@@ -23,8 +22,6 @@ public:
 
 private:
     Ui::ImageEditor *ui;
-
-    CommandHistory commandHistory;
 
     QLabel* imageLabel;
     QSlider* thresholdSlider;

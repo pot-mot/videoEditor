@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 project(videoEditor LANGUAGES CXX)
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets)
+find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets Multimedia MultimediaWidgets)
 find_package(OpenCV REQUIRED)
 
 message(STATUS "OpenCV_VERSION: ${OpenCV_VERSION}")
@@ -21,6 +21,7 @@ qt_add_executable(videoEditor
     commandhistory.h commandhistory.cpp
     imageeditor.h imageeditor.cpp imageeditor.ui
     videoeditor.h videoeditor.cpp videoeditor.ui
+    videoprocessor.h videoprocessor.cpp
 )
 
 target_include_directories(videoEditor
@@ -32,6 +33,8 @@ target_link_libraries(videoEditor
     PRIVATE
         Qt::Core
         Qt::Widgets
+        Qt::Multimedia
+        Qt::MultimediaWidgets
         ${OpenCV_LIBS}
 )
 
