@@ -1,16 +1,18 @@
 #ifndef FILEVIEWER_H
 #define FILEVIEWER_H
 
+#include <QWidget>
 #include <QDir>
 #include <QTreeWidget>
 #include <QStringList>
 #include <QPushButton>
+#include <QLineEdit>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class FileViewer; }
 QT_END_NAMESPACE
 
-class FileViewer : public QTreeWidget {
+class FileViewer : public QWidget {
     Q_OBJECT
 
 public:
@@ -28,12 +30,16 @@ public:
 private:
     Ui::FileViewer *ui;
     QPushButton *selectDirButton;
+    QLineEdit *filterLineEdit;
+    QTreeWidget *treeWidget; // 新增：将 QTreeWidget 作为私有属性
 
     // 递归加载目录内容
     void loadDirectory(const QDir &dir, QTreeWidgetItem *parentItem, const QStringList &filters);
 
 private slots:
-    void onSelectBaseDir(); // 新增：定义槽函数
+    void onSelectBaseDir();
+
+    void onFilterTextChanged(const QString &text);
 };
 
 #endif // FILEVIEWER_H

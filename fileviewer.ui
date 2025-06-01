@@ -4,7 +4,7 @@
     <comment/>
     <exportmacro/>
     <class>FileViewer</class>
-    <widget class="QTreeWidget" name="FileViewer">
+    <widget class="QWidget" name="FileViewer">
         <property name="geometry">
             <rect>
                 <x>0</x>
