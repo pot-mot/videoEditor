@@ -26,8 +26,8 @@ void VideoEditor::initUI()
     // 左侧栏 (1)
     QWidget *leftContainer = new QWidget(this);
     QVBoxLayout *leftLayout = new QVBoxLayout(leftContainer);
-    fileResourceTree = new QTreeWidget(this);
-    fileResourceTree->setHeaderLabel("文件资源");
+    fileResourceTree = new FileViewer(this);
+    fileResourceTree->typeFilters = { "mp4", "avi", "mov", "png", "jpg", "mp3", "wav" };
     leftLayout->addWidget(fileResourceTree);
 
     // 中间栏 (3)

@@ -22,6 +22,12 @@ qt_add_executable(videoEditor
     imageeditor.h imageeditor.cpp imageeditor.ui
     videoeditor.h videoeditor.cpp videoeditor.ui
     videoprocessor.h videoprocessor.cpp
+        videotimeline.cpp
+        videotimeline.h
+        videotimeline.ui
+        fileviewer.cpp
+        fileviewer.h
+        fileviewer.ui
 )
 
 target_include_directories(videoEditor
