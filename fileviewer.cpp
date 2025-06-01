@@ -5,7 +5,7 @@
 #include <QTreeWidgetItem>
 #include <QFileDialog>
 #include <QLineEdit>
-#include <QVBoxLayout> // 新增：引入 QVBoxLayout
+#include <QVBoxLayout>
 #include <QDebug>
 
 FileViewer::FileViewer(QWidget *parent) :
@@ -24,6 +24,7 @@ FileViewer::FileViewer(QWidget *parent) :
     layout->addWidget(filterLineEdit); // 将输入框添加到布局
 
     treeWidget = new QTreeWidget(this);
+    treeWidget->setMinimumWidth(150);
     treeWidget->setHeaderLabel("文件列表");
     layout->addWidget(treeWidget); // 将树形控件添加到布局
 
@@ -59,7 +60,7 @@ void FileViewer::loadDirectory(const QDir &dir, QTreeWidgetItem *parentItem, con
             if (entry.isDir()) {
                 loadDirectory(QDir(entry.absoluteFilePath()), item, filters);
             }
-        } else {
+        } else if (entry.isFile() && filters.contains(entry.suffix())) {
             QTreeWidgetItem *item = new QTreeWidgetItem(parentItem, QStringList(entry.fileName()));
             if (entry.isDir()) {
                 loadDirectory(QDir(entry.absoluteFilePath()), item, filters);
