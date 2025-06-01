@@ -4,8 +4,9 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QTabWidget>
-#include "imageeditor.h"
-#include "videoeditor.h"
+#include <QMenuBar>
+#include "image/imageeditor.h"
+#include "video/videoeditor.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

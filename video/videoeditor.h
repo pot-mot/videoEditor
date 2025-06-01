@@ -6,7 +6,7 @@
 #include <QVideoWidget>
 #include <QSlider>
 #include <QToolButton>
-#include "fileviewer.h"
+#include "../file/fileviewer.h"
 
 namespace Ui {
 class VideoEditor;

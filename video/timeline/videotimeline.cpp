@@ -15,3 +15,15 @@ VideoTimeline::VideoTimeline(QWidget *parent) :
 VideoTimeline::~VideoTimeline() {
     delete ui;
 }
+
+// 实现 addClip 方法
+void VideoTimeline::addClip(Clip *clip) {
+    clips.append(clip);
+}
+
+// 实现 removeClip 方法
+void VideoTimeline::removeClip(int index) {
+    if (index >= 0 && index < clips.size()) {
+        clips.removeAt(index);
+    }
+}
