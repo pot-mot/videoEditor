@@ -5,10 +5,11 @@
 #ifndef CLIPSPREVIEW_H
 #define CLIPSPREVIEW_H
 #include <QImage>
-#include "../clip/audioclip.h"
+#include "../clip/AudioClip.h"
 
 class ClipsPreview {
-    QImage preview(QList<Clip *> clips, int currentTime, int width, int height);
+public:
+    static QImage preview(QList<Clip *> clips, int currentTime, int width, int height, double fps);
 };
 
 

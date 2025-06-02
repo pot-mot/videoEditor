@@ -1,12 +1,13 @@
 #ifndef VIDEOEDITOR_H
 #define VIDEOEDITOR_H
 
+#include <QLabel>
 #include <QMainWindow>
 #include <QWidget>
 #include <QVideoWidget>
 #include <QSlider>
-#include <QToolButton>
 #include "../file/fileviewer.h"
+#include "../video/timeline/videotimeline.h"
 
 namespace Ui {
 class VideoEditor;
@@ -25,11 +26,14 @@ private:
 
     void initUI();
 
+    double fps;
+    int width;
+    int height;
+
     FileViewer *fileResourceTree;
-    QVideoWidget *videoPreview;
+    QLabel *videoPreview;
     QSlider *mainTimeline;
-    QSlider *sliceTimeline;
-    QToolButton *functionMenu;
+    VideoTimeline *sliceTimeline;
 };
 
 #endif // VIDEOEDITOR_H

@@ -1,13 +1,13 @@
 #include "ClipsPreview.h"
 
-#include "../clip/videoclip.h"
-#include "../clip/imageclip.h"
-#include "../clip/textclip.h"
+#include "../clip/VideoClip.h"
+#include "../clip/ImageClip.h"
+#include "../clip/TextClip.h"
 #include "../../utils/MatImageConvert.h"
 #include <QPainter>
 #include <opencv2/imgproc.hpp>
 
-QImage ClipsPreview::preview(QList<Clip *> clips, int currentTime, int width, int height) {
+QImage ClipsPreview::preview(QList<Clip *> clips, int currentTime, int width, int height, double fps) {
     QImage image(width, height, QImage::Format_RGB888);
     image.fill(Qt::black); // 使用黑色填充背景
     
@@ -19,7 +19,7 @@ QImage ClipsPreview::preview(QList<Clip *> clips, int currentTime, int width, in
             case ResourceType::Video: {
                 VideoClip *videoClip = static_cast<VideoClip*>(clip);
                 QRect displayArea = videoClip->getDisplayArea();
-                cv::Mat frame = videoClip->getFrameAtTime(currentTime);
+                cv::Mat frame = videoClip->getFrameAtTime(currentTime, fps);
                 painter.drawImage(displayArea, MatImageConvert::toImage(frame));
                 break;
             }

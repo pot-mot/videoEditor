@@ -26,5 +26,4 @@ public:
 };
 
 
-
 #endif //MATTOIMAGE_H

@@ -1,7 +1,7 @@
 #ifndef TEXTCLIP_H
 #define TEXTCLIP_H
 
-#include "clipbase.h"
+#include "ClipBase.h"
 #include <QRect>
 
 // 文本切片类，继承自 Clip

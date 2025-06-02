@@ -3,10 +3,14 @@
 
 #include <QWidget>
 #include <QList>
-#include "../clip/clipbase.h"  // 引入基类 Clip
+#include "../clip/ClipBase.h"  // 引入基类 Clip
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class VideoTimeline; }
+
+namespace Ui {
+    class VideoTimeline;
+}
+
 QT_END_NAMESPACE
 
 class VideoTimeline : public QWidget {
@@ -14,20 +18,18 @@ class VideoTimeline : public QWidget {
 
 public:
     explicit VideoTimeline(QWidget *parent = nullptr);
+
     ~VideoTimeline() override;
 
-    // 新增方法：添加 clip
     void addClip(Clip *clip);
 
-    // 新增方法：移除 clip
     void removeClip(int index);
+
+    QList<Clip *> getClips() { return clips; }
 
 private:
     Ui::VideoTimeline *ui;
-    QList<Clip*> clips;         // 存储所有 clip 数据
-
-    // 新增方法：更新 timeline
-    void updateTimeline();
+    QList<Clip *> clips; // 存储所有 clip 数据
 
 signals:
     // 新增信号：通知 timeline 更新

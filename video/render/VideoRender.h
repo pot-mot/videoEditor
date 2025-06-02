@@ -6,11 +6,11 @@
 #define VIDEORENDER_H
 #include <opencv2/core/cvstd.hpp>
 
-#include "../clip/clipbase.h"
+#include "../clip/ClipBase.h"
 
 class VideoRender {
 public:
-    static void render(const cv::String &outputPath, QList<Clip *> clips);
+    static void render(const cv::String &outputPath, QList<Clip *> clips, int width, int height, double fps);
 };
 
 

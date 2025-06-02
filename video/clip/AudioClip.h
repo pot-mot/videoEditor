@@ -1,14 +1,14 @@
 #ifndef AUDIOCLIP_H
 #define AUDIOCLIP_H
 
-#include "clipbase.h"
+#include "ClipBase.h"
 
 // 音频切片类，继承自 Clip
 class AudioClip : public Clip {
 public:
-    AudioClip(const QString &filePath, int startTime, int offsetTime, int length,
+    AudioClip(const QString &filePath, int startTime, int offsetTime, int duration,
               qreal volume, const QString &externalEffect)
-        : Clip(ResourceType::Audio, filePath, startTime, offsetTime, length),
+        : Clip(ResourceType::Audio, filePath, startTime, offsetTime, duration),
           volume(volume), externalEffect(externalEffect) {}
 
     qreal getVolume() const { return volume; }

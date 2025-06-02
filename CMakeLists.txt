@@ -47,6 +47,7 @@ qt_add_executable(videoEditor
         video/preview/ClipsPreview.h
         video/clip/videoclip.cpp
         utils/MatImageConvert.h
+        video/clip/ImageClip.cpp
 )
 
 target_include_directories(videoEditor
