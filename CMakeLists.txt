@@ -43,6 +43,10 @@ qt_add_executable(videoEditor
         video/clip/textclip.h
         video/render/VideoRender.cpp
         video/render/VideoRender.h
+        video/preview/ClipsPreview.cpp
+        video/preview/ClipsPreview.h
+        video/clip/videoclip.cpp
+        utils/MatImageConvert.h
 )
 
 target_include_directories(videoEditor

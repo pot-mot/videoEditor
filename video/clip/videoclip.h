@@ -3,6 +3,7 @@
 
 #include "clipbase.h"
 #include <QRect>
+#include <opencv2/core/mat.hpp>
 
 // 视频切片类，继承自 Clip
 class VideoClip : public Clip {
@@ -19,6 +20,9 @@ public:
     void setDisplayArea(const QRect &area) { displayArea = area; }
     void setOpacity(qreal value) { opacity = value; }
     void setExternalEffect(const QString &effect) { externalEffect = effect; }
+
+    // 新增方法声明：获取指定时间点的视频帧
+    cv::Mat getFrameAtTime(int timeMs) const;
 
 private:
     QRect displayArea;          // 显示区域
