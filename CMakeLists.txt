@@ -41,6 +41,8 @@ qt_add_executable(videoEditor
         video/clip/audioclip.h
         video/clip/videoclip.h
         video/clip/textclip.h
+        video/render/VideoRender.cpp
+        video/render/VideoRender.h
 )
 
 target_include_directories(videoEditor
