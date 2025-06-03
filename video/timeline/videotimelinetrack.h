@@ -39,6 +39,8 @@ protected:
 
 private:
     Ui::VideoTimelineTrack *ui;
+    int timeHeight = 20;
+    int paddingBottom = 40;
 
     bool dragging = false;
     Clip* draggedClip = nullptr;
