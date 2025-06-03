@@ -20,13 +20,6 @@ void VideoTimelineTrack::paintEvent(QPaintEvent *event) {
     QWidget::paintEvent(event);
     QPainter painter(this);
 
-    // 绘制时间轴背景
-    // painter.setPen(Qt::lightGray);
-    // for (int x = 0; x < width(); x += 50) {
-    //     painter.drawLine(x, 0, x, height());
-    // }
-
-    int maxX = 0;
     VideoTimeline *timeline = getTimeline();
     double scale = timeline->getScale();
     int scrollLeft = timeline->getScrollLeft();
@@ -35,6 +28,19 @@ void VideoTimelineTrack::paintEvent(QPaintEvent *event) {
     int scrollHeight = timeline->getScrollHeight();
     int trackHeight = timeline->getTrackHeight();
     int trackGap = timeline->getTrackGap();
+
+    int baseTickInterval = 100; // 每 100ms 一个刻度（基于原始时间）
+    double scaledTickInterval = baseTickInterval * scale; // 根据 scale 缩放为像素间隔
+
+    // painter.setPen(Qt::lightGray);
+    // for (int x = 0; x < scrollWidth; x += scaledTickInterval) {
+    //     int timeMs = static_cast<int>(x / scale); // 将像素位置转换为时间（ms）
+    //
+    //     painter.drawLine(x, 0, x, height()); // 绘制刻度线
+    //     painter.drawText(QPoint(x + 2, 15), QString("%1ms").arg(timeMs)); // 显示时间标签
+    // }
+
+    int maxX = 0;
 
     int y = scrollTop;
     for (const auto &clip: timeline->getClips()) {
@@ -45,16 +51,17 @@ void VideoTimelineTrack::paintEvent(QPaintEvent *event) {
         painter.fillRect(rect, Qt::blue); // 可以根据 ResourceType 设置不同颜色
         painter.drawText(rect, Qt::AlignCenter, clip->getFilePath());
 
-        if (clipWidth + xStart > maxX) {
-            maxX = clipWidth + xStart;
+        int currentRight = clip->getStartTime() + clip->getDuration();
+        if (currentRight > maxX) {
+            maxX = currentRight;
         }
         y += trackHeight + trackGap;
     }
 
-    scrollWidth = maxX;
+    scrollWidth = maxX * scale;
     scrollHeight = y;
 
-    timeline->getHorizontalScrollBar()->setRange(0, scrollWidth - width());
+    timeline->getHorizontalScrollBar()->setRange(0,  scrollWidth - width());
     timeline->getVerticalScrollBar()->setRange(0, scrollHeight - height());
 
     qDebug() << "scrollWidth: " << scrollWidth << ", scrollHeight: " << scrollHeight;
@@ -65,6 +72,7 @@ void VideoTimelineTrack::mousePressEvent(QMouseEvent *event) {
         VideoTimeline *timeline = getTimeline();
         double scale = timeline->getScale();
         int scrollTop = timeline->getScrollTop();
+        int scrollLeft = timeline->getScrollLeft();
         int trackHeight = timeline->getTrackHeight();
         int trackGap = timeline->getTrackGap();
 
@@ -87,9 +95,9 @@ void VideoTimelineTrack::mousePressEvent(QMouseEvent *event) {
                 // 判断是头部还是尾部拖动
                 int leftEdge = xStart;
                 int rightEdge = xStart + widthClip;
-                if (std::abs(event->position().x() - leftEdge) < 10) {
+                if (std::abs(event->position().x() - scrollLeft - leftEdge) < 20) {
                     dragMode = ResizeLeft;
-                } else if (std::abs(event->position().x() - rightEdge) < 10) {
+                } else if (std::abs(event->position().x() - scrollLeft - rightEdge) < 20) {
                     dragMode = ResizeRight;
                 } else {
                     dragMode = Move;
@@ -102,7 +110,7 @@ void VideoTimelineTrack::mousePressEvent(QMouseEvent *event) {
 
 void VideoTimelineTrack::mouseMoveEvent(QMouseEvent *event) {
     if (dragging && draggedClip) {
-        int scale = getTimeline()->getScale();
+        double scale = getTimeline()->getScale();
         int dx = event->position().x() - dragStartPos.x();
         switch (dragMode) {
             case Move:

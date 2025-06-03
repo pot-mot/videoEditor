@@ -49,10 +49,10 @@ private:
     Ui::VideoTimeline *ui;
     QList<Clip *> clips; // 存储所有 clip 数据
 
-    int scrollTop = 20; // 轨道绘制区域顶部偏移量（y）
-    int scrollLeft = 20; // 轨道绘制区域左侧偏移量（x）
-    int scrollHeight = 20; // 完全滚动长度
-    int scrollWidth = 20; // 完全滚动宽度
+    int scrollTop = 0; // 轨道绘制区域顶部偏移量（y）
+    int scrollLeft = 0; // 轨道绘制区域左侧偏移量（x）
+    int scrollHeight = 0; // 完全滚动长度
+    int scrollWidth = 0; // 完全滚动宽度
 
     QScrollBar *horizontalScrollBar; // 横向滚动条
     QScrollBar *verticalScrollBar; // 纵向滚动条
@@ -60,7 +60,7 @@ private:
     int trackHeight = 30; // 轨道高度
     int trackGap = 10; // 轨道间隔（y）
 
-    double scale = 100; // 时间缩放（以1ms为基础的缩放倍率）
+    double scale = 0.1; // 时间缩放（以1ms为基础的缩放倍率）
 
     VideoTimelineTrack * track;
 };
