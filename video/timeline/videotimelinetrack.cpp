@@ -48,7 +48,11 @@ void VideoTimelineTrack::paintEvent(QPaintEvent *event) {
         int clipWidth = clip->getDuration() * scale;
 
         QRect rect(xStart, y, clipWidth, trackHeight);
-        painter.fillRect(rect, Qt::blue); // 可以根据 ResourceType 设置不同颜色
+        if (clip == draggedClip) {
+            painter.fillRect(rect, "#1E90FF");
+        } else {
+            painter.fillRect(rect, Qt::darkGray); // 可以根据 ResourceType 设置不同颜色
+        }
         painter.drawText(rect, Qt::AlignCenter, clip->getFilePath());
 
         int currentRight = clip->getStartTime() + clip->getDuration();
@@ -105,6 +109,7 @@ void VideoTimelineTrack::mousePressEvent(QMouseEvent *event) {
                 break;
             }
         }
+        update();
     }
 }
 
@@ -128,7 +133,7 @@ void VideoTimelineTrack::mouseMoveEvent(QMouseEvent *event) {
             default:
                 break;
         }
-        update(); // 触发重绘
+        update();
     }
 }
 
@@ -137,5 +142,6 @@ void VideoTimelineTrack::mouseReleaseEvent(QMouseEvent *event) {
         dragging = false;
         draggedClip = nullptr;
         dragMode = None;
+        update();
     }
 }
