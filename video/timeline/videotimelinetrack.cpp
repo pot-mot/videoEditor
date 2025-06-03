@@ -44,12 +44,19 @@ void VideoTimelineTrack::paintEvent(QPaintEvent *event) {
 
     int y = scrollTop;
     for (const auto &clip: timeline->getClips()) {
-        int xStart = clip->getStartTime() * scale + scrollLeft;
-        int clipWidth = clip->getDuration() * scale;
+        int clipRectX = clip->getStartTime() * scale + scrollLeft;
+        int clipRectWidth = clip->getDuration() * scale;
 
-        QRect rect(xStart, y, clipWidth, trackHeight);
+        QRect rect(clipRectX, y, clipRectWidth, trackHeight);
         if (clip == draggedClip) {
             painter.fillRect(rect, "#1E90FF");
+            if (dragMode == DragMode::ResizeLeft) {
+                QRect leftRect(clipRectX, y, 5, trackHeight);
+                painter.fillRect(leftRect, Qt::red);
+            } else if (dragMode == DragMode::ResizeRight) {
+                QRect rightRect(clipRectX + clipRectWidth - 5, y, 5, trackHeight);
+                painter.fillRect(rightRect, Qt::red);
+            }
         } else {
             painter.fillRect(rect, Qt::darkGray); // 可以根据 ResourceType 设置不同颜色
         }
@@ -65,7 +72,7 @@ void VideoTimelineTrack::paintEvent(QPaintEvent *event) {
     scrollWidth = maxX * scale;
     scrollHeight = y;
 
-    timeline->getHorizontalScrollBar()->setRange(0,  scrollWidth - width());
+    timeline->getHorizontalScrollBar()->setRange(0, scrollWidth - width());
     timeline->getVerticalScrollBar()->setRange(0, scrollHeight - height());
 
     qDebug() << "scrollWidth: " << scrollWidth << ", scrollHeight: " << scrollHeight;
@@ -99,9 +106,9 @@ void VideoTimelineTrack::mousePressEvent(QMouseEvent *event) {
                 // 判断是头部还是尾部拖动
                 int leftEdge = clipRectX;
                 int rightEdge = clipRectX + clipRectWidth;
-                if (std::abs(event->position().x() - scrollLeft - leftEdge) < 20) {
+                if (std::abs(event->position().x() - leftEdge) < 20) {
                     dragMode = ResizeLeft;
-                } else if (std::abs(event->position().x() - scrollLeft - rightEdge) < 20) {
+                } else if (std::abs(event->position().x()- rightEdge) < 20) {
                     dragMode = ResizeRight;
                 } else {
                     dragMode = Move;
@@ -120,15 +127,21 @@ void VideoTimelineTrack::mouseMoveEvent(QMouseEvent *event) {
         double diff = dx / scale;
         switch (dragMode) {
             case Move:
+                emit getTimeline()->beforeClipChange();
                 draggedClip->setStartTime(originalStartTime + diff);
+                emit getTimeline()->clipChanged();
                 break;
             case ResizeLeft:
+                emit getTimeline()->beforeClipChange();
                 draggedClip->setStartTime(originalStartTime + diff);
                 draggedClip->setOffsetTime(originalOffsetTime - diff);
                 draggedClip->setDuration(originalDuration - diff);
+                emit getTimeline()->clipChanged();
                 break;
             case ResizeRight:
+                emit getTimeline()->beforeClipChange();
                 draggedClip->setDuration(originalDuration + diff);
+                emit getTimeline()->clipChanged();
                 break;
             default:
                 break;

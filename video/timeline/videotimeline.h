@@ -42,6 +42,10 @@ public:
     QScrollBar *getHorizontalScrollBar() const { return horizontalScrollBar; }
     QScrollBar *getVerticalScrollBar() const { return verticalScrollBar; }
 
+signals:
+    void beforeClipChange();
+    void clipChanged();
+
 protected:
     void resizeEvent(QResizeEvent *event) override; // 尺寸变化事件
 
