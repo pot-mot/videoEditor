@@ -80,7 +80,11 @@ void VideoEditor::initUI()
     // 中间栏 (3)
     QWidget *middleContainer = new QWidget(this);
     QVBoxLayout *middleLayout = new QVBoxLayout(middleContainer);
+
     videoPreview = new QLabel(this);
+    videoPreview->setMinimumWidth(320);
+    videoPreview->setMinimumHeight(200);
+    videoPreview->setAlignment(Qt::AlignCenter);
 
     // 创建时间轴与控制按钮的水平布局
     QHBoxLayout *mainTimelineLayout = new QHBoxLayout();
@@ -89,9 +93,9 @@ void VideoEditor::initUI()
     // 时间轴滑块
     mainTimeline = new QSlider(Qt::Horizontal, this);
     mainTimeline->setRange(0, 0);
-    connect(mainTimeline, &QSlider::valueChanged, this, [this](int value) {
-        QImage result = ClipsPreview::preview(sliceTimeline->getClips(), value, videoPreview->width(), videoPreview->height(), fps);
-        videoPreview->setPixmap(QPixmap::fromImage(result));
+    mainTimeline->setMinimumWidth(60);
+    connect(mainTimeline, &QSlider::valueChanged, this, [this]() {
+        this->preview();
     });
     mainTimelineLayout->addWidget(mainTimeline);
 
@@ -165,12 +169,12 @@ void VideoEditor::initUI()
     mainTimelineLayout->addWidget(forwardButton);
 
     sliceTimeline = new VideoTimeline(this);
+    sliceTimeline->setMinimumHeight(120);
     connect(sliceTimeline, &VideoTimeline::totalDurationChange, this, [this](int duration) {
         mainTimeline->setMaximum(duration);
     });
     connect(sliceTimeline, &VideoTimeline::clipChanged, this, [this]() {
-        QImage result = ClipsPreview::preview(sliceTimeline->getClips(), mainTimeline->value(), videoPreview->width(), videoPreview->height(), fps);
-        videoPreview->setPixmap(QPixmap::fromImage(result));
+        this->preview();
     });
     QSpinBox* scaleSpinBox = new QSpinBox(this);
     scaleSpinBox->setRange(1, 100);
@@ -204,4 +208,14 @@ void VideoEditor::initUI()
     mainLayout->addWidget(middleContainer, 3);
     mainLayout->addWidget(rightContainer, 1);
     setCentralWidget(centralWidget);
+}
+
+void VideoEditor::resizeEvent(QResizeEvent *event) {
+    this->preview();
+}
+
+void VideoEditor::preview() {
+    QImage result = ClipsPreview::preview(sliceTimeline->getClips(), mainTimeline->value(), width, height, fps);
+    QPixmap pixmap = QPixmap::fromImage(result);
+    videoPreview->setPixmap(pixmap.scaled(videoPreview->width(), videoPreview->height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }

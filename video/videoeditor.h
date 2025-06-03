@@ -22,6 +22,9 @@ public:
     explicit VideoEditor(QWidget *parent = nullptr);
     ~VideoEditor();
 
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+
 private:
     Ui::VideoEditor *ui;
 
@@ -39,6 +42,8 @@ private:
     QLabel *videoPreview;
     QSlider *mainTimeline;
     VideoTimeline *sliceTimeline;
+
+    void preview();
 };
 
 #endif // VIDEOEDITOR_H
