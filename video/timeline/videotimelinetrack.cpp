@@ -112,16 +112,18 @@ void VideoTimelineTrack::mouseMoveEvent(QMouseEvent *event) {
     if (dragging && draggedClip) {
         double scale = getTimeline()->getScale();
         int dx = event->position().x() - dragStartPos.x();
+        double diff = dx / scale;
         switch (dragMode) {
             case Move:
-                draggedClip->setStartTime(originalStartTime + dx / scale);
+                draggedClip->setStartTime(originalStartTime + diff);
                 break;
             case ResizeLeft:
-                draggedClip->setOffsetTime(originalOffsetTime - dx / scale);
-                draggedClip->setDuration(originalDuration + dx / scale);
+                draggedClip->setStartTime(originalStartTime + diff);
+                draggedClip->setOffsetTime(originalOffsetTime - diff);
+                draggedClip->setDuration(originalDuration - diff);
                 break;
             case ResizeRight:
-                draggedClip->setDuration(originalDuration + dx / scale);
+                draggedClip->setDuration(originalDuration + diff);
                 break;
             default:
                 break;
