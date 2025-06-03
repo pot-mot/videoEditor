@@ -31,6 +31,9 @@ public:
 
     VideoTimeline* getTimeline() const { return static_cast<VideoTimeline *>(parent()); }
 
+signals:
+    void clipSelected(Clip *clip);
+
 protected:
     void paintEvent(QPaintEvent *event) override;        // 绘制时间轴和 Clips
     void mousePressEvent(QMouseEvent *event) override;   // 鼠标按下事件
@@ -42,6 +45,7 @@ private:
     int timeHeight = 20;
     int paddingBottom = 40;
 
+    Clip* selectedClip = nullptr;
     bool dragging = false;
     Clip* draggedClip = nullptr;
     QPoint dragStartPos;

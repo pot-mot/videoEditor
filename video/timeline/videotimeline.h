@@ -57,6 +57,8 @@ signals:
     void beforeClipChange();
     void clipChanged();
 
+    void clipSelected(Clip *clip);
+
 protected:
     void resizeEvent(QResizeEvent *event) override; // 尺寸变化事件
 

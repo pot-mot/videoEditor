@@ -3,22 +3,24 @@
 
 #include "ClipBase.h"
 #include <QRect>
+#include <QList>
 #include <opencv2/core/mat.hpp>
+#include "../effect/MatEffect.h"
 
 // 视频切片类，继承自 Clip
 class VideoClip : public Clip {
 public:
     VideoClip(const QString &filePath, int startTime, int offsetTime, int duration,
-              int maxDuration, const QRect &displayArea, const QString &externalEffect)
+              int maxDuration, const QRect &displayArea, const QList<MatEffect *> &externalEffect)
         : Clip(ResourceType::Video, filePath, startTime, offsetTime, duration),
           maxDuration(maxDuration), displayArea(displayArea), externalEffect(externalEffect) {}
 
     const int getMaxDuration() const { return maxDuration; }
     const QRect &getDisplayArea() const { return displayArea; }
-    const QString &getExternalEffect() const { return externalEffect; }
+    const QList<MatEffect *> &getExternalEffect() const { return externalEffect; }
 
     void setDisplayArea(const QRect &area) { displayArea = area; }
-    void setExternalEffect(const QString &effect) { externalEffect = effect; }
+    void setExternalEffect(const QList<MatEffect *> &effect) { externalEffect = effect; }
 
     void setOffsetTime(int time) override {
         if (time <= maxDuration) {
@@ -41,7 +43,7 @@ public:
 private:
     int maxDuration;            // 最长时长
     QRect displayArea;          // 显示区域
-    QString externalEffect;     // 外部效果
+    QList<MatEffect *> externalEffect;     // 外部效果
 };
 
 #endif // VIDEOCLIP_H

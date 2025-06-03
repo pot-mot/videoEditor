@@ -51,6 +51,8 @@ qt_add_executable(videoEditor
         video/timeline/videotimelinetrack.cpp
         video/timeline/videotimelinetrack.h
         video/timeline/videotimelinetrack.ui
+        video/effect/MatEffect.h
+        video/effect/MatEffect.cpp
 )
 
 target_include_directories(videoEditor

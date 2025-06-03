@@ -33,6 +33,9 @@ VideoTimeline::VideoTimeline(QWidget *parent) : QWidget(parent), ui(new Ui::Vide
     });
 
     track = new VideoTimelineTrack(this);
+    connect(track, &VideoTimelineTrack::clipSelected, this, [this](Clip *clip) {
+        emit this->clipSelected(clip);
+    });
 }
 
 VideoTimeline::~VideoTimeline() {
