@@ -18,6 +18,21 @@ public:
     void setVolume(qreal value) { volume = value; }
     void setExternalEffect(const QString &effect) { externalEffect = effect; }
 
+    void setOffsetTime(int time) override {
+        if (time <= maxDuration) {
+            offsetTime = time;
+        } else {
+            offsetTime = maxDuration;
+        }
+    }
+    void setDuration(int during) override {
+        if (during <= maxDuration) {
+            duration = during;
+        } else {
+            duration = maxDuration;
+        }
+    }
+
 private:
     int maxDuration;            // 最长时长
     qreal volume;               // 响度

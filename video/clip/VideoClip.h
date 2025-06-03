@@ -20,6 +20,21 @@ public:
     void setDisplayArea(const QRect &area) { displayArea = area; }
     void setExternalEffect(const QString &effect) { externalEffect = effect; }
 
+    void setOffsetTime(int time) override {
+        if (time <= maxDuration) {
+            offsetTime = time;
+        } else {
+            offsetTime = maxDuration;
+        }
+    }
+    void setDuration(int during) override {
+        if (during <= maxDuration) {
+            duration = during;
+        } else {
+            duration = maxDuration;
+        }
+    }
+
     // 新增方法声明：获取指定时间点的视频帧
     cv::Mat getFrameAtTime(int timeMs, double fps) const;
 

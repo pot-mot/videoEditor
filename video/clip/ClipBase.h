@@ -25,10 +25,10 @@ public:
 
     void setFilePath(const QString &path) { filePath = path; }
     void setStartTime(int time) { startTime = time; }
-    void setOffsetTime(int time) { offsetTime = time; }
-    void setDuration(int during) { duration = during; }
+    virtual void setOffsetTime(int time) { offsetTime = time; }
+    virtual void setDuration(int during) { duration = during; }
 
-private:
+protected:
     ResourceType type;          // 资源类型
     QString filePath;           // 文件路径
     int startTime;              // 开始时间
