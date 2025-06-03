@@ -1,12 +1,10 @@
 cmake_minimum_required(VERSION 3.19)
 project(videoEditor LANGUAGES CXX)
 
+set(OpenCV_DIR E:/opencv/OpenCV-MinGW-Build-OpenCV-4.1.1-x64/include/opencv2)
+
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets Multimedia MultimediaWidgets)
 find_package(OpenCV REQUIRED)
-
-message(STATUS "OpenCV_VERSION: ${OpenCV_VERSION}")
-message(STATUS "OpenCV_INCLUDE_DIRS: ${OpenCV_INCLUDE_DIRS}")
-message(STATUS "OpenCV_LIBS: ${OpenCV_LIBS}")
 
 qt_standard_project_setup()
 
@@ -53,6 +51,9 @@ qt_add_executable(videoEditor
         video/timeline/videotimelinetrack.ui
         video/effect/MatEffect.h
         video/effect/MatEffect.cpp
+        video/clip/form/ClipForm.cpp
+        video/clip/form/ClipForm.h
+        video/clip/form/ClipForm.ui
 )
 
 target_include_directories(videoEditor

@@ -17,8 +17,7 @@
 
 VideoEditor::VideoEditor(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::VideoEditor)
-{
+      , ui(new Ui::VideoEditor) {
     ui->setupUi(this);
     fps = 30;
     width = 1280;
@@ -26,14 +25,12 @@ VideoEditor::VideoEditor(QWidget *parent)
     initUI(); // 调用初始化函数
 }
 
-VideoEditor::~VideoEditor()
-{
+VideoEditor::~VideoEditor() {
     delete ui;
 }
 
 // 新增 initUI 函数
-void VideoEditor::initUI()
-{
+void VideoEditor::initUI() {
     // 创建主布局
     QWidget *centralWidget = new QWidget(this);
     QHBoxLayout *mainLayout = new QHBoxLayout(centralWidget);
@@ -42,18 +39,18 @@ void VideoEditor::initUI()
     QWidget *leftContainer = new QWidget(this);
     QVBoxLayout *leftLayout = new QVBoxLayout(leftContainer);
     fileResourceTree = new FileViewer(this);
-    fileResourceTree->typeFilters = { "mp4", "png", "jpg", "mp3" };
-    connect( fileResourceTree, &FileViewer::fileSelected, this, [this](const QString &filePath) {
+    fileResourceTree->typeFilters = {"mp4", "png", "jpg", "mp3"};
+    connect(fileResourceTree, &FileViewer::fileSelected, this, [this](const QString &filePath) {
         QFileInfo fileInfo(filePath);
         QString suffix = fileInfo.suffix().toLower();
 
         if (suffix == "mp4" || suffix == "mp3") {
-            QMediaPlayer* player = new QMediaPlayer(this);
+            QMediaPlayer *player = new QMediaPlayer(this);
             connect(player, &QMediaPlayer::durationChanged, this, [this, filePath, suffix, player](int duration) {
                 try {
-                    Clip* clip = nullptr;
+                    Clip *clip = nullptr;
                     if (suffix == "mp4") {
-                        clip = new VideoClip(filePath, 0, 0, duration, duration, QRect(0,0,width,height), {});
+                        clip = new VideoClip(filePath, 0, 0, duration, duration, QRect(0, 0, width, height), {});
                     } else if (suffix == "mp3") {
                         clip = new AudioClip(filePath, 0, 0, duration, duration, 1.0, "");
                     }
@@ -62,13 +59,13 @@ void VideoEditor::initUI()
                         sliceTimeline->addClip(clip);
                     }
                     player->deleteLater();
-                } catch (const std::exception& e) {
+                } catch (const std::exception &e) {
                     player->deleteLater();
                 }
             });
             player->setSource(QUrl::fromLocalFile(filePath));
         } else if (suffix == "png" || suffix == "jpg") {
-            Clip* clip = new ImageClip(filePath, 0, 0, 5000, QRect(0,0,width,height), {});
+            Clip *clip = new ImageClip(filePath, 0, 0, 5000, QRect(0, 0, width, height), {});
             if (clip != nullptr) {
                 qDebug() << "Added clip:" << filePath;
                 sliceTimeline->addClip(clip);
@@ -100,17 +97,17 @@ void VideoEditor::initUI()
     mainTimelineLayout->addWidget(mainTimeline);
 
     // 播放倍速
-    QComboBox* speedComboBox = new QComboBox(this);
+    QComboBox *speedComboBox = new QComboBox(this);
     speedComboBox->addItem("0.125x", "0.125");
-    speedComboBox->addItem("0.25x",  "0.25");
-    speedComboBox->addItem("0.5x",   "0.5");
-    speedComboBox->addItem("0.75x",     "0.75");
-    speedComboBox->addItem("1x",     "1.0");
-    speedComboBox->addItem("1.25x",  "1.25");
-    speedComboBox->addItem("1.5x",   "1.5");
-    speedComboBox->addItem("2x",     "2.0");
-    speedComboBox->addItem("4x",     "4.0");
-    speedComboBox->addItem("8x",     "8.0");
+    speedComboBox->addItem("0.25x", "0.25");
+    speedComboBox->addItem("0.5x", "0.5");
+    speedComboBox->addItem("0.75x", "0.75");
+    speedComboBox->addItem("1x", "1.0");
+    speedComboBox->addItem("1.25x", "1.25");
+    speedComboBox->addItem("1.5x", "1.5");
+    speedComboBox->addItem("2x", "2.0");
+    speedComboBox->addItem("4x", "4.0");
+    speedComboBox->addItem("8x", "8.0");
     speedComboBox->setCurrentText("1x");
 
     connect(speedComboBox, &QComboBox::currentIndexChanged, this, [this, speedComboBox](int index) {
@@ -140,7 +137,7 @@ void VideoEditor::initUI()
         int maxValue = mainTimeline->maximum();
 
         if (currentValue < maxValue) {
-            mainTimeline->setValue(static_cast<int>(currentValue + interval * this -> playSpeed));
+            mainTimeline->setValue(static_cast<int>(currentValue + interval * this->playSpeed));
         } else {
             playTimer->stop();
             isPlaying = false;
@@ -176,7 +173,11 @@ void VideoEditor::initUI()
     connect(sliceTimeline, &VideoTimeline::clipChanged, this, [this]() {
         this->preview();
     });
-    QSpinBox* scaleSpinBox = new QSpinBox(this);
+    connect(sliceTimeline, &VideoTimeline::clipSelected, this, [this](Clip *clip) {
+        this->selectedClip = clip;
+        this->clipForm->setClip(clip);
+    });
+    QSpinBox *scaleSpinBox = new QSpinBox(this);
     scaleSpinBox->setRange(1, 100);
     scaleSpinBox->setValue(5);
     connect(scaleSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](int value) {
@@ -192,15 +193,22 @@ void VideoEditor::initUI()
     QWidget *rightContainer = new QWidget(this);
     QVBoxLayout *rightLayout = new QVBoxLayout(rightContainer);
 
-    QToolButton* exportButton = new QToolButton(this);
+    clipForm = new ClipForm(this);
+    connect(clipForm, &ClipForm::clipChanged, this, [this]() {
+        this->update();
+    });
+
+    QToolButton *exportButton = new QToolButton(this);
     exportButton->setText("导出");
     connect(exportButton, &QToolButton::clicked, this, [this]() {
         QString filePath = QFileDialog::getSaveFileName(this, "保存视频文件", "", "MP4 Files (*.mp4)");
         if (!filePath.isEmpty()) {
-            QList<Clip*> clips = sliceTimeline->getClips();
+            QList<Clip *> clips = sliceTimeline->getClips();
             VideoRender::render(filePath.toStdString(), clips, width, height, fps);
         }
     });
+
+    rightLayout->addWidget(clipForm);
     rightLayout->addWidget(exportButton);
 
     // 设置主布局
@@ -217,5 +225,6 @@ void VideoEditor::resizeEvent(QResizeEvent *event) {
 void VideoEditor::preview() {
     QImage result = ClipsPreview::preview(sliceTimeline->getClips(), mainTimeline->value(), width, height, fps);
     QPixmap pixmap = QPixmap::fromImage(result);
-    videoPreview->setPixmap(pixmap.scaled(videoPreview->width(), videoPreview->height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    videoPreview->setPixmap(pixmap.scaled(videoPreview->width(), videoPreview->height(), Qt::KeepAspectRatio,
+                                          Qt::SmoothTransformation));
 }

@@ -9,6 +9,8 @@
 #include <QTimer>
 #include "../file/fileviewer.h"
 #include "../video/timeline/videotimeline.h"
+#include "clip/ClipBase.h"
+#include "clip/form/ClipForm.h"
 
 namespace Ui {
 class VideoEditor;
@@ -42,6 +44,9 @@ private:
     QLabel *videoPreview;
     QSlider *mainTimeline;
     VideoTimeline *sliceTimeline;
+    ClipForm* clipForm;
+
+    Clip * selectedClip;
 
     void preview();
 };
