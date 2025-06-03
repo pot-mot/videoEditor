@@ -31,6 +31,13 @@ public:
     void removeClip(int index);
 
     QList<Clip *> getClips() const { return clips; }
+
+    void setTotalDuration(int duration) {
+        totalDuration = duration;
+        emit totalDurationChange(duration);
+    }
+    int getTotalDuration() const { return totalDuration; }
+
     int getScrollTop() const { return scrollTop; }
     int getScrollLeft() const { return scrollLeft; }
     int getScrollHeight() const { return scrollHeight; }
@@ -43,6 +50,8 @@ public:
     QScrollBar *getVerticalScrollBar() const { return verticalScrollBar; }
 
 signals:
+    void totalDurationChange(int duration);
+
     void beforeClipChange();
     void clipChanged();
 
@@ -52,6 +61,8 @@ protected:
 private:
     Ui::VideoTimeline *ui;
     QList<Clip *> clips; // 存储所有 clip 数据
+
+    int totalDuration = 0;
 
     int scrollTop = 0; // 轨道绘制区域顶部偏移量（y）
     int scrollLeft = 0; // 轨道绘制区域左侧偏移量（x）

@@ -42,6 +42,7 @@ void VideoTimelineTrack::paintEvent(QPaintEvent *event) {
 
     scrollWidth = maxX * scale;
     scrollHeight = y + paddingBottom;
+    timeline->setTotalDuration(maxX);
 
     timeline->getHorizontalScrollBar()->setRange(0, scrollWidth - width());
     timeline->getVerticalScrollBar()->setRange(0, scrollHeight - height());
