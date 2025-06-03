@@ -12,6 +12,7 @@
 #include "clip/TextClip.h"
 #include <QToolButton>
 #include <QMediaPlayer>
+#include <QSpinBox>
 
 VideoEditor::VideoEditor(QWidget *parent)
     : QMainWindow(parent)
@@ -89,8 +90,20 @@ void VideoEditor::initUI()
     connect(sliceTimeline, &VideoTimeline::totalDurationChange, this, [this](int duration) {
         mainTimeline->setMaximum(duration);
     });
+    connect(sliceTimeline, &VideoTimeline::clipChanged, this, [this]() {
+        QImage result = ClipsPreview::preview(sliceTimeline->getClips(), mainTimeline->value(), videoPreview->width(), videoPreview->height(), fps);
+        videoPreview->setPixmap(QPixmap::fromImage(result));
+    });
+    QSpinBox* scaleSpinBox = new QSpinBox(this);
+    scaleSpinBox->setRange(1, 100);
+    scaleSpinBox->setValue(5);
+    connect(scaleSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](int value) {
+        sliceTimeline->setScale(1.0 / value);
+        sliceTimeline->update();
+    });
     middleLayout->addWidget(videoPreview);
     middleLayout->addWidget(mainTimeline);
+    middleLayout->addWidget(scaleSpinBox);
     middleLayout->addWidget(sliceTimeline);
 
     // 右侧栏 (1)

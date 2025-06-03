@@ -41,15 +41,19 @@ VideoTimeline::~VideoTimeline() {
 
 // 实现 addClip 方法
 void VideoTimeline::addClip(Clip *clip) {
+    emit this->beforeClipChange();
     clips.append(clip);
     update();
+    emit this->clipChanged();
 }
 
 // 实现 removeClip 方法
 void VideoTimeline::removeClip(int index) {
     if (index >= 0 && index < clips.size()) {
+        emit this->beforeClipChange();
         clips.removeAt(index);
         update();
+        emit this->clipChanged();
     }
 }
 

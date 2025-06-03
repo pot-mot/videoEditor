@@ -46,6 +46,8 @@ public:
     int getTrackGap() const { return trackGap; }
     double getScale() const { return scale; }
 
+    void setScale(double newScale) { scale = newScale; }
+
     QScrollBar *getHorizontalScrollBar() const { return horizontalScrollBar; }
     QScrollBar *getVerticalScrollBar() const { return verticalScrollBar; }
 
