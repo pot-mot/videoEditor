@@ -9,10 +9,11 @@
 class VideoClip : public Clip {
 public:
     VideoClip(const QString &filePath, int startTime, int offsetTime, int duration,
-              const QRect &displayArea, const QString &externalEffect)
+              int maxDuration, const QRect &displayArea, const QString &externalEffect)
         : Clip(ResourceType::Video, filePath, startTime, offsetTime, duration),
-          displayArea(displayArea), externalEffect(externalEffect) {}
+          maxDuration(maxDuration), displayArea(displayArea), externalEffect(externalEffect) {}
 
+    const int getMaxDuration() const { return maxDuration; }
     const QRect &getDisplayArea() const { return displayArea; }
     const QString &getExternalEffect() const { return externalEffect; }
 
@@ -23,6 +24,7 @@ public:
     cv::Mat getFrameAtTime(int timeMs, double fps) const;
 
 private:
+    int maxDuration;            // 最长时长
     QRect displayArea;          // 显示区域
     QString externalEffect;     // 外部效果
 };

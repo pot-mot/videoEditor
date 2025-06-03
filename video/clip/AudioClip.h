@@ -7,10 +7,11 @@
 class AudioClip : public Clip {
 public:
     AudioClip(const QString &filePath, int startTime, int offsetTime, int duration,
-              qreal volume, const QString &externalEffect)
+               int maxDuration, qreal volume, const QString &externalEffect)
         : Clip(ResourceType::Audio, filePath, startTime, offsetTime, duration),
-          volume(volume), externalEffect(externalEffect) {}
+          maxDuration(maxDuration), volume(volume), externalEffect(externalEffect) {}
 
+    const int getMaxDuration() const { return maxDuration; }
     qreal getVolume() const { return volume; }
     const QString &getExternalEffect() const { return externalEffect; }
 
@@ -18,6 +19,7 @@ public:
     void setExternalEffect(const QString &effect) { externalEffect = effect; }
 
 private:
+    int maxDuration;            // 最长时长
     qreal volume;               // 响度
     QString externalEffect;     // 外部效果
 };

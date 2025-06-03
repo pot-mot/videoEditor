@@ -51,9 +51,9 @@ void VideoEditor::initUI()
                 try {
                     Clip* clip = nullptr;
                     if (suffix == "mp4") {
-                        clip = new VideoClip(filePath, 0, 0, duration, QRect(0,0,width,height), "");
+                        clip = new VideoClip(filePath, 0, 0, duration, duration, QRect(0,0,width,height), "");
                     } else if (suffix == "mp3") {
-                        clip = new AudioClip(filePath, 0, 0, duration, 1.0, "");
+                        clip = new AudioClip(filePath, 0, 0, duration, duration, 1.0, "");
                     }
                     qDebug() << "Added clip:" << filePath << "duration:" << duration;
                     if (clip != nullptr) {
