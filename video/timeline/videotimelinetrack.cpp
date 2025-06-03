@@ -29,29 +29,40 @@ void VideoTimelineTrack::paintEvent(QPaintEvent *event) {
     int trackHeight = timeline->getTrackHeight();
     int trackGap = timeline->getTrackGap();
 
-    int maxX = 0;
+    int totalDuration = 0;
     int y = timeHeight + scrollTop;
 
     for (const auto &clip: timeline->getClips()) {
         int currentRight = clip->getStartTime() + clip->getDuration();
-        if (currentRight > maxX) {
-            maxX = currentRight;
+        if (currentRight > totalDuration) {
+            totalDuration = currentRight;
         }
         y += trackHeight + trackGap;
     }
 
-    scrollWidth = maxX * scale;
+    scrollWidth = totalDuration * scale;
     scrollHeight = y + paddingBottom;
-    timeline->setTotalDuration(maxX);
+    timeline->setTotalDuration(totalDuration);
 
     timeline->getHorizontalScrollBar()->setRange(0, scrollWidth - width());
     timeline->getVerticalScrollBar()->setRange(0, scrollHeight - height());
 
     // 显示时间刻度
-    int tickInterval = 500; // 每 500ms 一个刻度（基于原始时间）
+    int tickInterval = 1000; // 初始基准间隔为 1000ms
+
+    double visibleTickCount;
+    do {
+        visibleTickCount = static_cast<double>(width()) / (tickInterval * scale);
+
+        if (visibleTickCount > 20) {
+            tickInterval *= 2; // 刻度过密，增大间隔
+        } else if (visibleTickCount < 4) {
+            tickInterval /= 2; // 刻度过疏，减小间隔
+        }
+    } while (visibleTickCount > 20 || visibleTickCount < 4);
 
     painter.setPen(Qt::lightGray);
-    for (int tick = 0; tick < maxX; tick += tickInterval) {
+    for (int tick = 0; tick < totalDuration; tick += tickInterval) {
         double x = tick * scale + scrollLeft;
         painter.drawLine(x, 0, x, height()); // 绘制刻度线
         painter.drawText(QPoint(x, 15), QString("%1ms").arg(tick)); // 显示时间标签
