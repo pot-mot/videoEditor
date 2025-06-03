@@ -6,6 +6,7 @@
 #include <QWidget>
 #include <QVideoWidget>
 #include <QSlider>
+#include <QTimer>
 #include "../file/fileviewer.h"
 #include "../video/timeline/videotimeline.h"
 
@@ -29,6 +30,10 @@ private:
     double fps;
     int width;
     int height;
+
+    QTimer* playTimer = new QTimer(this);      // 播放定时器
+    bool isPlaying = false;
+    double playSpeed = 1.0; // 播放速度
 
     FileViewer *fileResourceTree;
     QLabel *videoPreview;

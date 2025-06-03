@@ -13,6 +13,7 @@
 #include <QToolButton>
 #include <QMediaPlayer>
 #include <QSpinBox>
+#include <QComboBox>
 
 VideoEditor::VideoEditor(QWidget *parent)
     : QMainWindow(parent)
@@ -80,12 +81,89 @@ void VideoEditor::initUI()
     QWidget *middleContainer = new QWidget(this);
     QVBoxLayout *middleLayout = new QVBoxLayout(middleContainer);
     videoPreview = new QLabel(this);
+
+    // 创建时间轴与控制按钮的水平布局
+    QHBoxLayout *mainTimelineLayout = new QHBoxLayout();
+    mainTimelineLayout->setSpacing(5); // 设置控件间距
+
+    // 时间轴滑块
     mainTimeline = new QSlider(Qt::Horizontal, this);
     mainTimeline->setRange(0, 0);
     connect(mainTimeline, &QSlider::valueChanged, this, [this](int value) {
         QImage result = ClipsPreview::preview(sliceTimeline->getClips(), value, videoPreview->width(), videoPreview->height(), fps);
         videoPreview->setPixmap(QPixmap::fromImage(result));
     });
+    mainTimelineLayout->addWidget(mainTimeline);
+
+    // 播放倍速
+    QComboBox* speedComboBox = new QComboBox(this);
+    speedComboBox->addItem("0.125x", "0.125");
+    speedComboBox->addItem("0.25x",  "0.25");
+    speedComboBox->addItem("0.5x",   "0.5");
+    speedComboBox->addItem("0.75x",     "0.75");
+    speedComboBox->addItem("1x",     "1.0");
+    speedComboBox->addItem("1.25x",  "1.25");
+    speedComboBox->addItem("1.5x",   "1.5");
+    speedComboBox->addItem("2x",     "2.0");
+    speedComboBox->addItem("4x",     "4.0");
+    speedComboBox->addItem("8x",     "8.0");
+    speedComboBox->setCurrentText("1x");
+
+    connect(speedComboBox, &QComboBox::currentIndexChanged, this, [this, speedComboBox](int index) {
+        playSpeed = speedComboBox->itemData(index).toString().toDouble();
+    });
+
+    mainTimelineLayout->addWidget(speedComboBox);
+
+    // 播放/暂停按钮
+    QPushButton *playPauseButton = new QPushButton(" > ", this);
+    playPauseButton->setFixedWidth(32);
+    connect(playPauseButton, &QPushButton::clicked, this, [this, playPauseButton]() {
+        if (this->isPlaying) {
+            playPauseButton->setText(" > ");
+            playTimer->stop();
+        } else {
+            playPauseButton->setText("| |");
+            playTimer->start();
+        }
+        isPlaying = !isPlaying;
+    });
+
+    double interval = 1000 / fps;
+    playTimer->setInterval(interval);
+    connect(playTimer, &QTimer::timeout, this, [this, playPauseButton, interval]() {
+        int currentValue = mainTimeline->value();
+        int maxValue = mainTimeline->maximum();
+
+        if (currentValue < maxValue) {
+            mainTimeline->setValue(static_cast<int>(currentValue + interval * this -> playSpeed));
+        } else {
+            playTimer->stop();
+            isPlaying = false;
+            playPauseButton->setText(" > ");
+        }
+    });
+
+    // 后退
+    QPushButton *rewindButton = new QPushButton("<<", this);
+    rewindButton->setFixedWidth(32);
+    connect(rewindButton, &QPushButton::clicked, this, [this]() {
+        int newValue = qMax(0, mainTimeline->value() - 200);
+        mainTimeline->setValue(newValue);
+    });
+
+    // 前进
+    QPushButton *forwardButton = new QPushButton(">>", this);
+    forwardButton->setFixedWidth(32);
+    connect(forwardButton, &QPushButton::clicked, this, [this]() {
+        int newValue = qMin(mainTimeline->maximum(), mainTimeline->value() + 200);
+        mainTimeline->setValue(newValue);
+    });
+
+    mainTimelineLayout->addWidget(rewindButton);
+    mainTimelineLayout->addWidget(playPauseButton);
+    mainTimelineLayout->addWidget(forwardButton);
+
     sliceTimeline = new VideoTimeline(this);
     connect(sliceTimeline, &VideoTimeline::totalDurationChange, this, [this](int duration) {
         mainTimeline->setMaximum(duration);
@@ -102,7 +180,7 @@ void VideoEditor::initUI()
         sliceTimeline->update();
     });
     middleLayout->addWidget(videoPreview);
-    middleLayout->addWidget(mainTimeline);
+    middleLayout->addLayout(mainTimelineLayout);
     middleLayout->addWidget(scaleSpinBox);
     middleLayout->addWidget(sliceTimeline);
 
