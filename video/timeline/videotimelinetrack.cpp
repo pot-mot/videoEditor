@@ -78,9 +78,9 @@ void VideoTimelineTrack::mousePressEvent(QMouseEvent *event) {
 
         int y = scrollTop;
         for (auto clip: timeline->getClips()) {
-            int xStart = clip->getStartTime() * scale;
-            int widthClip = clip->getDuration() * scale;
-            QRect rect(xStart, y, widthClip, trackHeight);
+            int clipRectX = clip->getStartTime() * scale + scrollLeft;
+            int clipRectWidth = clip->getDuration() * scale;
+            QRect rect(clipRectX, y, clipRectWidth, trackHeight);
             y += trackHeight + trackGap;
 
             // 判断点击是否在 Clip 内
@@ -93,8 +93,8 @@ void VideoTimelineTrack::mousePressEvent(QMouseEvent *event) {
                 originalDuration = clip->getDuration();
 
                 // 判断是头部还是尾部拖动
-                int leftEdge = xStart;
-                int rightEdge = xStart + widthClip;
+                int leftEdge = clipRectX;
+                int rightEdge = clipRectX + clipRectWidth;
                 if (std::abs(event->position().x() - scrollLeft - leftEdge) < 20) {
                     dragMode = ResizeLeft;
                 } else if (std::abs(event->position().x() - scrollLeft - rightEdge) < 20) {
