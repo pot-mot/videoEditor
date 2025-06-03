@@ -80,10 +80,15 @@ void VideoEditor::initUI()
     QVBoxLayout *middleLayout = new QVBoxLayout(middleContainer);
     videoPreview = new QLabel(this);
     mainTimeline = new QSlider(Qt::Horizontal, this);
+    mainTimeline->setRange(0, 0);
     connect(mainTimeline, &QSlider::valueChanged, this, [this](int value) {
-        qDebug() << "Main timeline position:" << value;
+        QImage result = ClipsPreview::preview(sliceTimeline->getClips(), value, videoPreview->width(), videoPreview->height(), fps);
+        videoPreview->setPixmap(QPixmap::fromImage(result));
     });
     sliceTimeline = new VideoTimeline(this);
+    connect(sliceTimeline, &VideoTimeline::totalDurationChange, this, [this](int duration) {
+        mainTimeline->setMaximum(duration);
+    });
     middleLayout->addWidget(videoPreview);
     middleLayout->addWidget(mainTimeline);
     middleLayout->addWidget(sliceTimeline);
@@ -91,14 +96,6 @@ void VideoEditor::initUI()
     // 右侧栏 (1)
     QWidget *rightContainer = new QWidget(this);
     QVBoxLayout *rightLayout = new QVBoxLayout(rightContainer);
-
-    QToolButton* previewButton = new QToolButton(this);
-    previewButton->setText("预览");
-    connect(previewButton, &QToolButton::clicked, this, [this]() {
-        QImage result = ClipsPreview::preview(sliceTimeline->getClips(), mainTimeline->value(), videoPreview->width(), videoPreview->height(), fps);
-        videoPreview->setPixmap(QPixmap::fromImage(result));
-    });
-    rightLayout->addWidget(previewButton);
 
     QToolButton* exportButton = new QToolButton(this);
     exportButton->setText("导出");

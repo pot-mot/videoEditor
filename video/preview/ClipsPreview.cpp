@@ -15,32 +15,34 @@ QImage ClipsPreview::preview(QList<Clip *> clips, int currentTime, int width, in
     painter.setRenderHint(QPainter::Antialiasing);
     
     foreach (Clip* clip, clips) {
-        switch (clip->getType()) {
-            case ResourceType::Video: {
-                VideoClip *videoClip = static_cast<VideoClip*>(clip);
-                QRect displayArea = videoClip->getDisplayArea();
-                cv::Mat frame = videoClip->getFrameAtTime(currentTime, fps);
-                painter.drawImage(displayArea, MatImageConvert::toImage(frame));
-                break;
-            }
-            case ResourceType::Image: {
-                ImageClip *imageClip = static_cast<ImageClip*>(clip);
-                QImage img(imageClip->getFilePath());
-                if (!img.isNull()) {
-                    painter.drawImage(imageClip->getDisplayArea(), img);
+        if (currentTime >= clip->getStartTime() && currentTime < clip->getStartTime() + clip->getDuration()) {
+            switch (clip->getType()) {
+                case ResourceType::Video: {
+                    VideoClip *videoClip = static_cast<VideoClip*>(clip);
+                    QRect displayArea = videoClip->getDisplayArea();
+                    cv::Mat frame = videoClip->getFrameAtTime(currentTime, fps);
+                    painter.drawImage(displayArea, MatImageConvert::toImage(frame));
+                    break;
                 }
-                break;
+                case ResourceType::Image: {
+                    ImageClip *imageClip = static_cast<ImageClip*>(clip);
+                    QImage img(imageClip->getFilePath());
+                    if (!img.isNull()) {
+                        painter.drawImage(imageClip->getDisplayArea(), img);
+                    }
+                    break;
+                }
+                case ResourceType::Text: {
+                    TextClip *textClip = static_cast<TextClip*>(clip);
+                    QRect area = textClip->getDisplayArea();
+                    painter.setPen(Qt::white);
+                    painter.setFont(QFont("Arial", area.height()/4)); // 字号自适应区域
+                    painter.drawText(area, Qt::AlignCenter, textClip->getText());
+                    break;
+                }
+                default:
+                    break;
             }
-            case ResourceType::Text: {
-                TextClip *textClip = static_cast<TextClip*>(clip);
-                QRect area = textClip->getDisplayArea();
-                painter.setPen(Qt::white);
-                painter.setFont(QFont("Arial", area.height()/4)); // 字号自适应区域
-                painter.drawText(area, Qt::AlignCenter, textClip->getText());
-                break;
-            }
-            default:
-                break;
         }
     }
     
