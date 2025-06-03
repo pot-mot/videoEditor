@@ -48,6 +48,9 @@ qt_add_executable(videoEditor
         video/clip/videoclip.cpp
         utils/MatImageConvert.h
         video/clip/ImageClip.cpp
+        video/timeline/videotimelinetrack.cpp
+        video/timeline/videotimelinetrack.h
+        video/timeline/videotimelinetrack.ui
 )
 
 target_include_directories(videoEditor

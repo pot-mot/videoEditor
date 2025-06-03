@@ -5,8 +5,11 @@
 #include <QList>
 #include <QPainter>
 #include <QMouseEvent>
+#include <QScrollBar>
+
 #include "../clip/ClipBase.h"  // 引入基类 Clip
 
+class VideoTimelineTrack;
 QT_BEGIN_NAMESPACE
 
 namespace Ui {
@@ -14,8 +17,6 @@ namespace Ui {
 }
 
 QT_END_NAMESPACE
-
-enum DragMode { None, Move, ResizeLeft, ResizeRight };
 
 class VideoTimeline : public QWidget {
     Q_OBJECT
@@ -29,32 +30,39 @@ public:
 
     void removeClip(int index);
 
-    QList<Clip *> getClips() { return clips; }
+    QList<Clip *> getClips() const { return clips; }
+    int getScrollTop() const { return scrollTop; }
+    int getScrollLeft() const { return scrollLeft; }
+    int getScrollHeight() const { return scrollHeight; }
+    int getScrollWidth() const { return scrollWidth; }
+    int getTrackHeight() const { return trackHeight; }
+    int getTrackGap() const { return trackGap; }
+    double getScale() const { return scale; }
+
+    QScrollBar *getHorizontalScrollBar() const { return horizontalScrollBar; }
+    QScrollBar *getVerticalScrollBar() const { return verticalScrollBar; }
 
 protected:
-    void paintEvent(QPaintEvent *event) override;        // 绘制时间轴和 Clips
-    void mousePressEvent(QMouseEvent *event) override;   // 鼠标按下事件
-    void mouseMoveEvent(QMouseEvent *event) override;    // 鼠标移动事件
-    void mouseReleaseEvent(QMouseEvent *event) override; // 鼠标释放事件
+    void resizeEvent(QResizeEvent *event) override; // 尺寸变化事件
 
 private:
     Ui::VideoTimeline *ui;
     QList<Clip *> clips; // 存储所有 clip 数据
 
-    double scale = 1;
-    bool dragging = false;
-    Clip* draggedClip = nullptr;
-    QPoint dragStartPos;
-    int originalStartTime = 0;
-    int originalOffsetTime = 0;
-    int originalDuration = 0;
-    DragMode dragMode = None;
+    int scrollTop = 20; // 轨道绘制区域顶部偏移量（y）
+    int scrollLeft = 20; // 轨道绘制区域左侧偏移量（x）
+    int scrollHeight = 20; // 完全滚动长度
+    int scrollWidth = 20; // 完全滚动宽度
 
-    int yPositionForClip(const Clip *clip) const;
+    QScrollBar *horizontalScrollBar; // 横向滚动条
+    QScrollBar *verticalScrollBar; // 纵向滚动条
 
-signals:
-    // 新增信号：通知 timeline 更新
-    void timelineUpdated();
+    int trackHeight = 30; // 轨道高度
+    int trackGap = 10; // 轨道间隔（y）
+
+    double scale = 100; // 时间缩放（以1ms为基础的缩放倍率）
+
+    VideoTimelineTrack * track;
 };
 
 #endif //VIDEOTIMELINE_H
