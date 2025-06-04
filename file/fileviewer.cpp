@@ -57,16 +57,22 @@ void FileViewer::loadDirectory(const QDir &dir, QTreeWidgetItem *parentItem, con
     QFileInfoList entries = dir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot);
     for (const QFileInfo &entry : entries) {
         if (parentItem == nullptr) {
-            QTreeWidgetItem *item = new QTreeWidgetItem(treeWidget, QStringList(entry.fileName()));
-            item->setData(0, Qt::UserRole, entry.absoluteFilePath());
             if (entry.isDir()) {
+                QTreeWidgetItem *item = new QTreeWidgetItem(treeWidget, QStringList(entry.fileName()));
+                item->setData(0, Qt::UserRole, entry.absoluteFilePath());
                 loadDirectory(QDir(entry.absoluteFilePath()), item, filters);
+            } else if (entry.isFile() && filters.contains(entry.suffix())) {
+                QTreeWidgetItem *item = new QTreeWidgetItem(treeWidget, QStringList(entry.fileName()));
+                item->setData(0, Qt::UserRole, entry.absoluteFilePath());
             }
-        } else if (entry.isFile() && filters.contains(entry.suffix())) {
-            QTreeWidgetItem *item = new QTreeWidgetItem(parentItem, QStringList(entry.fileName()));
-            item->setData(0, Qt::UserRole, entry.absoluteFilePath());
+        } else {
             if (entry.isDir()) {
+                QTreeWidgetItem *item = new QTreeWidgetItem(parentItem, QStringList(entry.fileName()));
+                item->setData(0, Qt::UserRole, entry.absoluteFilePath());
                 loadDirectory(QDir(entry.absoluteFilePath()), item, filters);
+            } else if (entry.isFile() && filters.contains(entry.suffix())) {
+                QTreeWidgetItem *item = new QTreeWidgetItem(parentItem, QStringList(entry.fileName()));
+                item->setData(0, Qt::UserRole, entry.absoluteFilePath());
             }
         }
     }
