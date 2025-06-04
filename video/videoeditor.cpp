@@ -15,6 +15,8 @@
 #include <QSpinBox>
 #include <QComboBox>
 
+#include "../utils/MatImageConvert.h"
+
 VideoEditor::VideoEditor(QWidget *parent)
     : QMainWindow(parent)
       , ui(new Ui::VideoEditor) {
@@ -50,7 +52,7 @@ void VideoEditor::initUI() {
                 try {
                     Clip *clip = nullptr;
                     if (suffix == "mp4") {
-                        clip = new VideoClip(filePath, 0, 0, duration, duration, QRect(0, 0, width, height), {});
+                        clip = new VideoClip(filePath, 0, 0, duration, duration, cv::Rect(0, 0, width, height), {});
                     } else if (suffix == "mp3") {
                         clip = new AudioClip(filePath, 0, 0, duration, duration, 1.0, "");
                     }
@@ -65,7 +67,7 @@ void VideoEditor::initUI() {
             });
             player->setSource(QUrl::fromLocalFile(filePath));
         } else if (suffix == "png" || suffix == "jpg") {
-            Clip *clip = new ImageClip(filePath, 0, 0, 5000, QRect(0, 0, width, height), {});
+            Clip *clip = new ImageClip(filePath, 0, 0, 5000, cv::Rect(0, 0, width, height), {});
             if (clip != nullptr) {
                 qDebug() << "Added clip:" << filePath;
                 sliceTimeline->addClip(clip);
@@ -223,8 +225,21 @@ void VideoEditor::resizeEvent(QResizeEvent *event) {
 }
 
 void VideoEditor::preview() {
-    QImage result = ClipsPreview::preview(sliceTimeline->getClips(), mainTimeline->value(), width, height, fps);
+    QImage result = MatImageConvert::toImage(
+        ClipsPreview::preview(
+            sliceTimeline->getClips(),
+            mainTimeline->value(),
+            fps,
+            cv::Rect(0, 0, width, height)
+        )
+    );
     QPixmap pixmap = QPixmap::fromImage(result);
-    videoPreview->setPixmap(pixmap.scaled(videoPreview->width(), videoPreview->height(), Qt::KeepAspectRatio,
-                                          Qt::SmoothTransformation));
+    videoPreview->setPixmap(
+        pixmap.scaled(
+            videoPreview->width(),
+            videoPreview->height(),
+            Qt::KeepAspectRatio,
+            Qt::SmoothTransformation
+        )
+    );
 }

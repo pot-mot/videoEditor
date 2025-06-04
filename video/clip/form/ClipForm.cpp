@@ -120,7 +120,7 @@ void ClipForm::setClip(Clip *clip) {
         durationSpin->setValue(currentClip->getDuration());
 
         bool hasDisplayArea = false;
-        QRect displayArea;
+        cv::Rect displayArea;
 
         if (currentClip->getType() == ResourceType::Video) {
             displayArea = dynamic_cast<VideoClip *>(currentClip)->getDisplayArea();
@@ -133,10 +133,10 @@ void ClipForm::setClip(Clip *clip) {
         if (hasDisplayArea) {
             displayAreaConfig->show();
 
-            displayAreaLeftSpin->setValue(displayArea.left());
-            displayAreaTopSpin->setValue(displayArea.top());
-            displayAreaWidthSpin->setValue(displayArea.width());
-            displayAreaHeightSpin->setValue(displayArea.height());
+            displayAreaLeftSpin->setValue(displayArea.x);
+            displayAreaTopSpin->setValue(displayArea.y);
+            displayAreaWidthSpin->setValue(displayArea.width);
+            displayAreaHeightSpin->setValue(displayArea.height);
         } else {
             displayAreaConfig->hide();
         }
@@ -206,7 +206,7 @@ void ClipForm::applyToClip() {
     }
 
     if (hasDisplayArea) {
-        QRect displayArea(
+        cv::Rect displayArea(
             displayAreaLeftSpin->value(),
             displayAreaTopSpin->value(),
             displayAreaWidthSpin->value(),

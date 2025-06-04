@@ -7,9 +7,8 @@
 #include <QPainter>
 #include <opencv2/imgproc.hpp>
 
-QImage ClipsPreview::preview(QList<Clip *> clips, int currentTime, int width, int height, double fps) {
-    cv::Rect frameRect(0, 0, width, height);
-    cv::Mat frame = cv::Mat::zeros(height, width, CV_8UC3);
+cv::Mat ClipsPreview::preview(QList<Clip *> clips, int currentTime, double fps, const cv::Rect &frameRect) {
+    cv::Mat frame = cv::Mat::zeros(frameRect.height, frameRect.width, CV_8UC3);
 
     for (const auto &clip: clips) {
         if (currentTime >= clip->getStartTime() && currentTime < clip->getStartTime() + clip->getDuration()) {
@@ -21,32 +20,7 @@ QImage ClipsPreview::preview(QList<Clip *> clips, int currentTime, int width, in
                     if (videoFrame.empty()) {
                         break;
                     }
-                    QRect displayArea = videoClip->getDisplayArea();
-                    int x = displayArea.x();
-                    int y = displayArea.y();
-                    int displayWidth = displayArea.width();
-                    int displayheight = displayArea.height();
-
-                    // 获取目标区域（在 frame 上的位置和大小）
-                    cv::Rect roi(x, y, displayWidth, displayheight);
-                    // 计算与 frame 的交集，即“实际可绘制区域”
-                    cv::Rect safeRoi = roi & frameRect;
-
-                    // 如果交集为空，说明完全越界，跳过复制
-                    if (safeRoi.width > 0 && safeRoi.height > 0) {
-                        cv::Mat resizedFrame;
-                        cv::resize(videoFrame, resizedFrame, cv::Size(displayWidth, displayheight));
-
-                        // 确保 resizedFrame 是 3 通道 BGR 图像
-                        if (resizedFrame.channels() != 3) {
-                            cv::cvtColor(resizedFrame, resizedFrame, cv::COLOR_BGRA2BGR); // 假设是带透明通道的 PNG
-                        }
-
-                        resizedFrame.copyTo(frame(safeRoi));
-                        resizedFrame.release();
-                    }
-
-                    videoFrame.release();
+                    drawResizedImageToFrame(frame, videoFrame, videoClip->getDisplayArea(), frameRect);
                     break;
                 }
                 case ResourceType::Image: {
@@ -56,33 +30,7 @@ QImage ClipsPreview::preview(QList<Clip *> clips, int currentTime, int width, in
                     if (imageFrame.empty()) {
                         break;
                     }
-
-                    QRect displayArea = imageClip->getDisplayArea();
-                    int x = displayArea.x();
-                    int y = displayArea.y();
-                    int displayWidth = displayArea.width();
-                    int displayheight = displayArea.height();
-
-                    // 获取目标区域（在 frame 上的位置和大小）
-                    cv::Rect roi(x, y, displayWidth, displayheight);
-                    // 计算与 frame 的交集，即“实际可绘制区域”
-                    cv::Rect safeRoi = roi & frameRect;
-
-                    // 如果交集为空，说明完全越界，跳过复制
-                    if (safeRoi.width > 0 && safeRoi.height > 0) {
-                        cv::Mat resizedFrame;
-                        cv::resize(imageFrame, resizedFrame, cv::Size(displayWidth, displayheight));
-
-                        // 确保 resizedFrame 是 3 通道 BGR 图像
-                        if (resizedFrame.channels() != 3) {
-                            cv::cvtColor(resizedFrame, resizedFrame, cv::COLOR_BGRA2BGR); // 假设是带透明通道的 PNG
-                        }
-
-                        resizedFrame.copyTo(frame(safeRoi));
-                        resizedFrame.release();
-                    }
-
-                    imageFrame.release();
+                    drawResizedImageToFrame(frame, imageFrame, imageClip->getDisplayArea(), frameRect);
                     break;
                 }
                 case ResourceType::Text: {
@@ -103,5 +51,51 @@ QImage ClipsPreview::preview(QList<Clip *> clips, int currentTime, int width, in
         }
     }
 
-    return MatImageConvert::toImage(frame);
+    return frame;
+}
+
+void ClipsPreview::drawResizedImageToFrame(
+    cv::Mat &frame,
+    const cv::Mat &image,
+    const cv::Rect &displayArea,
+    const cv::Rect &frameRect
+) {
+    // 计算与 frame 的交集，即“实际可绘制区域”
+    cv::Rect safeArea = displayArea & frameRect;
+
+    // 如果交集为空，说明完全越界，跳过复制
+    if (safeArea.width <= 0 || safeArea.height <= 0) {
+        return;
+    }
+
+    // 缩放图像到目标尺寸
+    cv::Mat resizedFrame;
+    cv::resize(image, resizedFrame, cv::Size(displayArea.width, displayArea.height));
+
+    // 确保 resizedFrame 是 3 通道 BGR 图像
+    if (resizedFrame.channels() != 3) {
+        cv::cvtColor(resizedFrame, resizedFrame, cv::COLOR_BGRA2BGR);
+    }
+
+    // 计算 resizedFrame 上的有效区域（对应于 safeRoi 在 roi 中的位置）
+    int srcX = safeArea.x - displayArea.x;
+    int srcY = safeArea.y - displayArea.y;
+    cv::Rect srcRect(srcX, srcY, safeArea.width, safeArea.height);
+
+    // 检查 srcRect 是否在 resizedFrame 的范围内
+    if (srcRect.x >= 0 && srcRect.y >= 0 &&
+        srcRect.width > 0 && srcRect.height > 0 &&
+        (srcRect.x + srcRect.width) <= resizedFrame.cols &&
+        (srcRect.y + srcRect.height) <= resizedFrame.rows) {
+        // 提取有效区域
+        cv::Mat validRegion = resizedFrame(srcRect);
+
+        // 复制到 frame 的安全区域
+        validRegion.copyTo(frame(safeArea));
+
+        validRegion.release();
+    }
+
+    // 释放资源
+    resizedFrame.release();
 }
