@@ -31,3 +31,17 @@ cv::Mat EdgeDetectionEffect::apply(const cv::Mat &image) const {
     cv::Canny(gray, edges, 100, 200);
     return edges;
 }
+
+cv::Mat FeatureDetectionEffect::apply(const cv::Mat &image) const {
+    cv::Mat grayImage;
+    cv::cvtColor(image, grayImage, cv::COLOR_BGR2GRAY);
+
+    cv::Ptr<cv::ORB> orb = cv::ORB::create();
+    std::vector<cv::KeyPoint> keypoints;
+    orb->detect(grayImage, keypoints);
+
+    cv::Mat outputImage;
+    cv::drawKeypoints(image, keypoints, outputImage, cv::Scalar::all(-1), cv::DrawMatchesFlags::DEFAULT);
+
+    return outputImage;
+}

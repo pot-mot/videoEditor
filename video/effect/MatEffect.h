@@ -9,7 +9,8 @@ enum class MatEffectType {
     Binarize,
     MeanFilter,
     GammaCorrection,
-    EdgeDetection
+    EdgeDetection,
+    FeatureDetection,
 };
 
 // 定义效果基类
@@ -18,7 +19,8 @@ public:
     MatEffect(MatEffectType type): _type(type) {
     }
 
-    virtual ~MatEffect() {};
+    virtual ~MatEffect() {
+    };
 
     virtual cv::Mat apply(const cv::Mat &image) const = 0;
 
@@ -33,7 +35,8 @@ static QMap<QString, MatEffectType> effectNameMap = {
     {"Binarize", MatEffectType::Binarize},
     {"Mean Filter", MatEffectType::MeanFilter},
     {"Gamma Correction", MatEffectType::GammaCorrection},
-    {"Edge Detection", MatEffectType::EdgeDetection}
+    {"Edge Detection", MatEffectType::EdgeDetection},
+    {"Feature Detection", MatEffectType::FeatureDetection}
 };
 
 static QMap<MatEffectType, QString> effectTypeMap = {
@@ -41,7 +44,8 @@ static QMap<MatEffectType, QString> effectTypeMap = {
     {MatEffectType::Binarize, "Binarize"},
     {MatEffectType::MeanFilter, "Mean Filter"},
     {MatEffectType::GammaCorrection, "Gamma Correction"},
-    {MatEffectType::EdgeDetection, "Edge Detection"}
+    {MatEffectType::EdgeDetection, "Edge Detection"},
+    {MatEffectType::FeatureDetection, "Feature Detection"}
 };
 
 
@@ -99,6 +103,15 @@ public:
     cv::Mat apply(const cv::Mat &image) const override;
 };
 
+// 特征识别效果类
+class FeatureDetectionEffect : public MatEffect {
+public:
+    FeatureDetectionEffect(): MatEffect(MatEffectType::FeatureDetection) {
+    }
+
+    cv::Mat apply(const cv::Mat &image) const override;
+};
+
 class EffectFactory {
 public:
     static MatEffect *createEffect(MatEffectType type) {
@@ -108,6 +121,7 @@ public:
             case MatEffectType::MeanFilter: return new MeanFilterEffect();
             case MatEffectType::GammaCorrection: return new GammaCorrectionEffect();
             case MatEffectType::EdgeDetection: return new EdgeDetectionEffect();
+            case MatEffectType::FeatureDetection: return new FeatureDetectionEffect();
             default: return nullptr;
         }
     }
