@@ -5,7 +5,7 @@
 // You may need to build the project (run Qt uic code generator) to get "ui_VideoTimeline.h" resolved
 
 #include "videotimeline.h"
-#include "ui_VideoTimeline.h"
+#include "ui_videotimeline.h"
 #include "videotimelinetrack.h"
 
 VideoTimeline::VideoTimeline(QWidget *parent) : QWidget(parent), ui(new Ui::VideoTimeline) {
