@@ -178,7 +178,7 @@ void VideoEditor::initUI() {
         this->clipForm->setClip(clip);
     });
     QSpinBox *scaleSpinBox = new QSpinBox(this);
-    scaleSpinBox->setRange(1, 100);
+    scaleSpinBox->setRange(1, 50000);
     scaleSpinBox->setValue(5);
     connect(scaleSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](int value) {
         sliceTimeline->setScale(1.0 / value);
