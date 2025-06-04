@@ -10,5 +10,9 @@ cv::Mat ImageClip::toMat() const {
         return cv::Mat();
     }
 
+    for (MatEffect *effect : externalEffect) {
+        image = effect->apply(image);
+    }
+
     return image;
 }

@@ -17,6 +17,10 @@ cv::Mat VideoClip::getFrameAtTime(int timeMs, double fps) const {
     
     cv::Mat frame;
     if (cap.read(frame)) {
+        for (MatEffect *effect : externalEffect) {
+            frame = effect->apply(frame);
+        }
+
         return frame;
     }
     return cv::Mat();
