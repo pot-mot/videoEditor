@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.19)
 project(videoEditor LANGUAGES CXX)
 
-set(OpenCV_DIR D:/opencv/OpenCV-MinGW-Build-OpenCV-4.1.1-x64/include/opencv2)
-
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets Multimedia MultimediaWidgets)
 find_package(OpenCV REQUIRED)
 
