@@ -36,6 +36,15 @@ static QMap<QString, MatEffectType> effectNameMap = {
     {"Edge Detection", MatEffectType::EdgeDetection}
 };
 
+static QMap<MatEffectType, QString> effectTypeMap = {
+    {MatEffectType::Grayscale, "Grayscale"},
+    {MatEffectType::Binarize, "Binarize"},
+    {MatEffectType::MeanFilter, "Mean Filter"},
+    {MatEffectType::GammaCorrection, "Gamma Correction"},
+    {MatEffectType::EdgeDetection, "Edge Detection"}
+};
+
+
 // 灰度效果类
 class GrayscaleEffect : public MatEffect {
 public:
