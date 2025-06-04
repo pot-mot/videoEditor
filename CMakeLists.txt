@@ -32,16 +32,16 @@ qt_add_executable(videoEditor
         file/fileviewer.h
         file/fileviewer.ui
 
-        video/clip/clipbase.h
-        video/clip/imageclip.h
-        video/clip/audioclip.h
-        video/clip/videoclip.h
-        video/clip/textclip.h
+        video/clip/ClipBase.h
+        video/clip/ImageClip.h
+        video/clip/AudioClip.h
+        video/clip/VideoClip.h
+        video/clip/TextClip.h
         video/render/VideoRender.cpp
         video/render/VideoRender.h
         video/preview/ClipsPreview.cpp
         video/preview/ClipsPreview.h
-        video/clip/videoclip.cpp
+        video/clip/VideoClip.cpp
         utils/MatImageConvert.h
         video/clip/ImageClip.cpp
         video/timeline/videotimelinetrack.cpp
