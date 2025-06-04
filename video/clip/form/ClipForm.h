@@ -7,6 +7,7 @@
 #include <QListWidget>
 #include <QGridLayout>
 #include <QPushButton>
+#include <QComboBox>
 
 #include "../ClipBase.h"
 #include "../../effect/MatEffect.h"
@@ -34,6 +35,10 @@ signals:
 
 private slots:
     void onBrowseClicked();
+
+    void onAddEffectClicked();
+    void onRemoveEffectClicked(QListWidgetItem *item);
+
     void onSaveClicked();
 
 private:
@@ -59,7 +64,8 @@ private:
     QSpinBox* displayAreaWidthSpin;
 
     QWidget* effectConfig;
-    QListWidget* effectList;
+    QComboBox *effectSelector;
+    QListWidget *selectedEffectList;
 };
 
 #endif // CLIPFORM_H

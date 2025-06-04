@@ -82,11 +82,21 @@ ClipForm::ClipForm(QWidget *parent): QWidget(parent), ui(new Ui::ClipForm) {
     QGridLayout *effectConfigLayout = new QGridLayout(effectConfig);
     effectConfig->setLayout(effectConfigLayout);
 
-    effectList = new QListWidget(effectConfig);
-    effectList->addItems(effectNameMap.keys());
-    effectList->setSelectionMode(QAbstractItemView::MultiSelection);
-    effectConfigLayout->addWidget(new QLabel("Effects"), 0, 0);
-    effectConfigLayout->addWidget(effectList, 1, 0, 1, 2);
+    effectSelector = new QComboBox(effectConfig);
+    effectSelector->addItems(effectNameMap.keys());
+
+    selectedEffectList = new QListWidget(effectConfig);
+
+    QPushButton *addButton = new QPushButton("Add Effect", effectConfig);
+    connect(addButton, &QPushButton::clicked, this, &ClipForm::onAddEffectClicked);
+
+    connect(selectedEffectList, &QListWidget::itemClicked, this, &ClipForm::onRemoveEffectClicked);
+
+    effectConfigLayout->addWidget(new QLabel("Available Effects"), 0, 0);
+    effectConfigLayout->addWidget(effectSelector, 1, 0);
+    effectConfigLayout->addWidget(addButton, 2, 0);
+    effectConfigLayout->addWidget(new QLabel("Selected Effects"), 3, 0);
+    effectConfigLayout->addWidget(selectedEffectList, 4, 0);
 
     layout->addWidget(effectConfig, row, 0, 1, 2);
     effectConfig->hide();
@@ -153,18 +163,14 @@ void ClipForm::setClip(Clip *clip) {
         }
 
         if (hasExternalEffect) {
-            effectConfig->show();
+            if (hasExternalEffect) {
+                effectConfig->show();
 
-            for (int i = 0; i < effectList->count(); ++i) {
-                QString effectName = effectList->item(i)->text();
-                bool isSelected = false;
-                for (MatEffect *effect: externalEffect) {
-                    if (effect->type() == effectNameMap[effectName]) {
-                        isSelected = true;
-                        break;
-                    }
+                selectedEffectList->clear();
+                for (MatEffect *effect : externalEffect) {
+                    QString effectName = effectTypeMap[effect->type()];
+                    selectedEffectList->addItem(effectName);
                 }
-                effectList->item(i)->setSelected(isSelected);
             }
         } else {
             effectConfig->hide();
@@ -177,6 +183,17 @@ void ClipForm::onBrowseClicked() {
     if (!filePath.isEmpty()) {
         filePathEdit->setText(filePath);
     }
+}
+
+void ClipForm::onAddEffectClicked() {
+    QString selectedEffect = effectSelector->currentText();
+    if (!selectedEffect.isEmpty()) {
+        selectedEffectList->addItem(selectedEffect);
+    }
+}
+
+void ClipForm::onRemoveEffectClicked(QListWidgetItem *item) {
+    delete selectedEffectList->takeItem(selectedEffectList->row(item));
 }
 
 void ClipForm::onSaveClicked() {
@@ -222,12 +239,11 @@ void ClipForm::applyToClip() {
 
     if (hasExternalEffect) {
         QList<MatEffect *> effects;
-        for (int i = 0; i < effectList->count(); ++i) {
-            if (effectList->item(i)->isSelected()) {
-                QString effectName = effectList->item(i)->text();
-                effects.append(EffectFactory::createEffect(effectNameMap[effectName]));
-            }
+        for (int i = 0; i < selectedEffectList->count(); ++i) {
+            QString effectName = selectedEffectList->item(i)->text();
+            effects.append(EffectFactory::createEffect(effectNameMap[effectName]));
         }
+
         if (currentClip->getType() == ResourceType::Video) {
             dynamic_cast<VideoClip *>(currentClip)->setExternalEffect(effects);
         } else if (currentClip->getType() == ResourceType::Image) {
