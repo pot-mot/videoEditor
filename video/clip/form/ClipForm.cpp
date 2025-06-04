@@ -44,35 +44,52 @@ ClipForm::ClipForm(QWidget *parent): QWidget(parent), ui(new Ui::ClipForm) {
     layout->addWidget(new QLabel("Duration"), row, 0);
     layout->addWidget(durationSpin, row++, 1);
 
-    displayAreaLeftSpin = new QSpinBox(this);
+    displayAreaConfig = new QWidget(this);
+    QGridLayout *displayAreaConfigLayout = new QGridLayout(displayAreaConfig);
+    displayAreaConfig->setLayout(displayAreaConfigLayout);
+    displayAreaConfigLayout->setColumnStretch(0, 1);
+    displayAreaConfigLayout->setColumnStretch(1, 3);
+
+    displayAreaLeftSpin = new QSpinBox(displayAreaConfig);
     displayAreaLeftSpin->setRange(-100000, 100000);
 
-    displayAreaTopSpin = new QSpinBox(this);
+    displayAreaTopSpin = new QSpinBox(displayAreaConfig);
     displayAreaTopSpin->setRange(-100000, 100000);
 
-    displayAreaWidthSpin = new QSpinBox(this);
+    displayAreaWidthSpin = new QSpinBox(displayAreaConfig);
     displayAreaWidthSpin->setRange(0, 10000);
 
-    displayAreaHeightSpin = new QSpinBox(this);
+    displayAreaHeightSpin = new QSpinBox(displayAreaConfig);
     displayAreaHeightSpin->setRange(0, 10000);
 
-    layout->addWidget(new QLabel("Display Area left"), row, 0);
-    layout->addWidget(displayAreaLeftSpin, row++, 1);
+    displayAreaConfigLayout->addWidget(new QLabel("Display Area left"), 0, 0);
+    displayAreaConfigLayout->addWidget(displayAreaLeftSpin, 0, 1);
 
-    layout->addWidget(new QLabel("Display Area top"), row, 0);
-    layout->addWidget(displayAreaTopSpin, row++, 1);
+    displayAreaConfigLayout->addWidget(new QLabel("Display Area top"), 1, 0);
+    displayAreaConfigLayout->addWidget(displayAreaTopSpin, 1, 1);
 
-    layout->addWidget(new QLabel("Display Area width"), row, 0);
-    layout->addWidget(displayAreaWidthSpin, row++, 1);
+    displayAreaConfigLayout->addWidget(new QLabel("Display Area width"), 2, 0);
+    displayAreaConfigLayout->addWidget(displayAreaWidthSpin, 2, 1);
 
-    layout->addWidget(new QLabel("Display Area height"), row, 0);
-    layout->addWidget(displayAreaHeightSpin, row++, 1);
+    displayAreaConfigLayout->addWidget(new QLabel("Display Area height"), 3, 0);
+    displayAreaConfigLayout->addWidget(displayAreaHeightSpin, 3, 1);
 
-    effectList = new QListWidget(this);
+    layout->addWidget(displayAreaConfig, row++, 0, 1, 2);
+    displayAreaConfig->hide();
+
+
+    effectConfig = new QWidget(this);
+    QGridLayout *effectConfigLayout = new QGridLayout(effectConfig);
+    effectConfig->setLayout(effectConfigLayout);
+
+    effectList = new QListWidget(effectConfig);
     effectList->addItems(effectNameMap.keys());
     effectList->setSelectionMode(QAbstractItemView::MultiSelection);
-    layout->addWidget(new QLabel("Effects"), row++, 0);
-    layout->addWidget(effectList, row, 0, 1, 2);
+    effectConfigLayout->addWidget(new QLabel("Effects"), 0, 0);
+    effectConfigLayout->addWidget(effectList, 1, 0, 1, 2);
+
+    layout->addWidget(effectConfig, row, 0, 1, 2);
+    effectConfig->hide();
 
     saveButton = new QPushButton("Save", this);
     connect(saveButton, &QPushButton::clicked, this, &ClipForm::onSaveClicked);
@@ -84,70 +101,74 @@ ClipForm::~ClipForm() {
 }
 
 void ClipForm::setClip(Clip *clip) {
-    if (clip == currentClip) return;
     currentClip = clip;
+    if (currentClip == nullptr) {
+        filePathEdit->setText("");
 
-    filePathEdit->setText(currentClip->getFilePath());
+        startTimeSpin->setValue(0);
+        offsetTimeSpin->setValue(0);
+        durationSpin->setValue(0);
 
-    startTimeSpin->setValue(currentClip->getStartTime());
-    offsetTimeSpin->setValue(currentClip->getOffsetTime());
-    durationSpin->setValue(currentClip->getDuration());
+        displayAreaConfig->hide();
 
-    bool hasDisplayArea = false;
-    QRect displayArea;
-
-    if (currentClip->getType() == ResourceType::Video) {
-        displayArea = dynamic_cast<VideoClip *>(currentClip)->getDisplayArea();
-        hasDisplayArea = true;
-    } else if (currentClip->getType() == ResourceType::Image) {
-        displayArea = dynamic_cast<ImageClip *>(currentClip)->getDisplayArea();
-        hasDisplayArea = true;
-    }
-
-    if (hasDisplayArea) {
-        displayAreaLeftSpin->show();
-        displayAreaTopSpin->show();
-        displayAreaWidthSpin->show();
-        displayAreaHeightSpin->show();
-
-        displayAreaLeftSpin->setValue(displayArea.left());
-        displayAreaTopSpin->setValue(displayArea.top());
-        displayAreaWidthSpin->setValue(displayArea.width());
-        displayAreaHeightSpin->setValue(displayArea.height());
+        effectConfig->hide();
     } else {
-        displayAreaLeftSpin->hide();
-        displayAreaTopSpin->hide();
-        displayAreaWidthSpin->hide();
-        displayAreaHeightSpin->hide();
-    }
+        filePathEdit->setText(currentClip->getFilePath());
 
-    bool hasExternalEffect = false;
-    QList<MatEffect *> externalEffect;
+        startTimeSpin->setValue(currentClip->getStartTime());
+        offsetTimeSpin->setValue(currentClip->getOffsetTime());
+        durationSpin->setValue(currentClip->getDuration());
 
-    if (currentClip->getType() == ResourceType::Video) {
-        externalEffect = dynamic_cast<VideoClip *>(currentClip)->getExternalEffect();
-        hasExternalEffect = true;
-    } else if (currentClip->getType() == ResourceType::Image) {
-        externalEffect = dynamic_cast<ImageClip *>(currentClip)->getExternalEffect();
-        hasExternalEffect = true;
-    }
+        bool hasDisplayArea = false;
+        QRect displayArea;
 
-    if (hasExternalEffect) {
-        effectList->show();
-
-        for (int i = 0; i < effectList->count(); ++i) {
-            QString effectName = effectList->item(i)->text();
-            bool isSelected = false;
-            for (MatEffect* effect : externalEffect) {
-                if (effect->type() == effectNameMap[effectName]) {
-                    isSelected = true;
-                    break;
-                }
-            }
-            effectList->item(i)->setSelected(isSelected);
+        if (currentClip->getType() == ResourceType::Video) {
+            displayArea = dynamic_cast<VideoClip *>(currentClip)->getDisplayArea();
+            hasDisplayArea = true;
+        } else if (currentClip->getType() == ResourceType::Image) {
+            displayArea = dynamic_cast<ImageClip *>(currentClip)->getDisplayArea();
+            hasDisplayArea = true;
         }
-    } else {
-        effectList->hide();
+
+        if (hasDisplayArea) {
+            displayAreaConfig->show();
+
+            displayAreaLeftSpin->setValue(displayArea.left());
+            displayAreaTopSpin->setValue(displayArea.top());
+            displayAreaWidthSpin->setValue(displayArea.width());
+            displayAreaHeightSpin->setValue(displayArea.height());
+        } else {
+            displayAreaConfig->hide();
+        }
+
+        bool hasExternalEffect = false;
+        QList<MatEffect *> externalEffect;
+
+        if (currentClip->getType() == ResourceType::Video) {
+            externalEffect = dynamic_cast<VideoClip *>(currentClip)->getExternalEffect();
+            hasExternalEffect = true;
+        } else if (currentClip->getType() == ResourceType::Image) {
+            externalEffect = dynamic_cast<ImageClip *>(currentClip)->getExternalEffect();
+            hasExternalEffect = true;
+        }
+
+        if (hasExternalEffect) {
+            effectConfig->show();
+
+            for (int i = 0; i < effectList->count(); ++i) {
+                QString effectName = effectList->item(i)->text();
+                bool isSelected = false;
+                for (MatEffect *effect: externalEffect) {
+                    if (effect->type() == effectNameMap[effectName]) {
+                        isSelected = true;
+                        break;
+                    }
+                }
+                effectList->item(i)->setSelected(isSelected);
+            }
+        } else {
+            effectConfig->hide();
+        }
     }
 }
 

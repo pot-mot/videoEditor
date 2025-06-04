@@ -52,11 +52,13 @@ private:
     QSpinBox* offsetTimeSpin;
     QSpinBox* durationSpin;
 
+    QWidget* displayAreaConfig;
     QSpinBox* displayAreaLeftSpin;
     QSpinBox* displayAreaTopSpin;
     QSpinBox* displayAreaHeightSpin;
     QSpinBox* displayAreaWidthSpin;
 
+    QWidget* effectConfig;
     QListWidget* effectList;
 };
 
