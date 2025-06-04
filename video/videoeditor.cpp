@@ -198,6 +198,7 @@ void VideoEditor::initUI() {
     clipForm = new ClipForm(this);
     connect(clipForm, &ClipForm::clipChanged, this, [this]() {
         this->update();
+        this->preview();
     });
 
     QToolButton *exportButton = new QToolButton(this);
