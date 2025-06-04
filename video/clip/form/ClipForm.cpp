@@ -24,7 +24,7 @@ ClipForm::ClipForm(QWidget *parent): QWidget(parent), ui(new Ui::ClipForm) {
     connect(browseButton, &QPushButton::clicked, this, &ClipForm::onBrowseClicked);
 
     startTimeSpin = new QSpinBox(this);
-    startTimeSpin->setRange(0, 1000000);
+    startTimeSpin->setRange(-1000000, 1000000);
 
     offsetTimeSpin = new QSpinBox(this);
     offsetTimeSpin->setRange(0, 1000000);
@@ -185,10 +185,29 @@ void ClipForm::onBrowseClicked() {
     }
 }
 
+bool ClipForm::hasExclusiveEffect() const {
+    for (int i = 0; i < selectedEffectList->count(); ++i) {
+        QString effectName = selectedEffectList->item(i)->text();
+        MatEffect *effect = EffectFactory::createEffect(effectNameMap[effectName]);
+        if (effect && effect->isExclusive()) {
+            delete effect;
+            return true;
+        }
+    }
+    return false;
+}
+
 void ClipForm::onAddEffectClicked() {
     QString selectedEffect = effectSelector->currentText();
     if (!selectedEffect.isEmpty()) {
-        selectedEffectList->addItem(selectedEffect);
+        MatEffect *effect = EffectFactory::createEffect(effectNameMap[selectedEffect]);
+        if (effect != nullptr) {
+            if (effect->isExclusive() || hasExclusiveEffect()) {
+                // 如果是排斥效果或者当前具有排斥效果，清空当前列表
+                selectedEffectList->clear();
+            }
+            selectedEffectList->addItem(selectedEffect);
+        }
     }
 }
 

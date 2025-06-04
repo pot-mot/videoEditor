@@ -24,6 +24,8 @@ public:
 
     virtual cv::Mat apply(const cv::Mat &image) const = 0;
 
+    virtual bool isExclusive() const { return false; }
+
     MatEffectType type() const { return _type; }
 
 private:
@@ -56,6 +58,8 @@ public:
     }
 
     cv::Mat apply(const cv::Mat &image) const override;
+
+    bool isExclusive() const override { return false; }
 };
 
 // 二值化效果类
@@ -65,6 +69,8 @@ public:
     }
 
     cv::Mat apply(const cv::Mat &image) const override;
+
+    bool isExclusive() const override { return true; }
 
 private:
     int threshold_;
@@ -77,6 +83,8 @@ public:
     }
 
     cv::Mat apply(const cv::Mat &image) const override;
+
+    bool isExclusive() const override { return false; }
 
 private:
     int kernelSize_;
@@ -101,6 +109,8 @@ public:
     }
 
     cv::Mat apply(const cv::Mat &image) const override;
+
+    bool isExclusive() const override { return true; }
 };
 
 // 特征识别效果类
@@ -110,6 +120,8 @@ public:
     }
 
     cv::Mat apply(const cv::Mat &image) const override;
+
+    bool isExclusive() const override { return true; }
 };
 
 class EffectFactory {

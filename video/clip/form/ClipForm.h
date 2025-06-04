@@ -66,6 +66,7 @@ private:
     QWidget* effectConfig;
     QComboBox *effectSelector;
     QListWidget *selectedEffectList;
+    bool hasExclusiveEffect() const;
 };
 
 #endif // CLIPFORM_H
