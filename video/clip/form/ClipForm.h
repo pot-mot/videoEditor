@@ -5,6 +5,8 @@
 #include <QSpinBox>
 #include <QWidget>
 #include <QListWidget>
+#include <QGridLayout>
+#include <QPushButton>
 
 #include "../ClipBase.h"
 #include "../../effect/MatEffect.h"
@@ -40,10 +42,21 @@ private:
     Ui::ClipForm *ui;
     Clip* currentClip = nullptr;
 
+    QGridLayout* layout;
+
+    QPushButton *browseButton;
+    QPushButton *saveButton;
+
     QLineEdit* filePathEdit;
     QSpinBox* startTimeSpin;
     QSpinBox* offsetTimeSpin;
     QSpinBox* durationSpin;
+
+    QSpinBox* displayAreaLeftSpin;
+    QSpinBox* displayAreaTopSpin;
+    QSpinBox* displayAreaHeightSpin;
+    QSpinBox* displayAreaWidthSpin;
+
     QListWidget* effectList;
 };
 

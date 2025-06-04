@@ -6,40 +6,77 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "../ImageClip.h"
+#include "../VideoClip.h"
+
 ClipForm::ClipForm(QWidget *parent): QWidget(parent), ui(new Ui::ClipForm) {
     ui->setupUi(this);
 
-    filePathEdit = new QLineEdit(this);
-    QPushButton *browseButton = new QPushButton("Browse", this);
-    startTimeSpin = new QSpinBox(this);
-    offsetTimeSpin = new QSpinBox(this);
-    durationSpin = new QSpinBox(this);
-    effectList = new QListWidget(this);
-    QPushButton *saveButton = new QPushButton("Save", this);
-
-    startTimeSpin->setRange(0, 1000000);
-    offsetTimeSpin->setRange(0, 1000000);
-    durationSpin->setRange(0, 1000000);
-
-    effectList->addItems({"Grayscale", "Binarize", "Mean Filter", "Gamma Correction", "Edge Detection"});
-    effectList->setSelectionMode(QAbstractItemView::MultiSelection);
-
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    layout->addWidget(filePathEdit);
-    layout->addWidget(browseButton);
-    layout->addWidget(new QLabel("Start Time"));
-    layout->addWidget(startTimeSpin);
-    layout->addWidget(new QLabel("Offset Time"));
-    layout->addWidget(offsetTimeSpin);
-    layout->addWidget(new QLabel("Duration"));
-    layout->addWidget(durationSpin);
-    layout->addWidget(new QLabel("Effects"));
-    layout->addWidget(effectList);
-    layout->addWidget(saveButton);
+    layout = new QGridLayout(this);
+    layout->setColumnStretch(0, 1);
+    layout->setColumnStretch(1, 3);
     setLayout(layout);
 
+    int row = 0;
+
+    filePathEdit = new QLineEdit(this);
+    browseButton = new QPushButton("Browse", this);
     connect(browseButton, &QPushButton::clicked, this, &ClipForm::onBrowseClicked);
+
+    startTimeSpin = new QSpinBox(this);
+    startTimeSpin->setRange(0, 1000000);
+
+    offsetTimeSpin = new QSpinBox(this);
+    offsetTimeSpin->setRange(0, 1000000);
+
+    durationSpin = new QSpinBox(this);
+    durationSpin->setRange(0, 1000000);
+
+    layout->addWidget(filePathEdit, row++, 0, 1, 2);
+    layout->addWidget(browseButton, row++, 0);
+
+    layout->addWidget(new QLabel("Start Time"), row, 0);
+    layout->addWidget(startTimeSpin, row++, 1);
+
+    layout->addWidget(new QLabel("Offset Time"), row, 0);
+    layout->addWidget(offsetTimeSpin, row++, 1);
+
+    layout->addWidget(new QLabel("Duration"), row, 0);
+    layout->addWidget(durationSpin, row++, 1);
+
+    displayAreaLeftSpin = new QSpinBox(this);
+    displayAreaLeftSpin->setRange(-100000, 100000);
+
+    displayAreaTopSpin = new QSpinBox(this);
+    displayAreaTopSpin->setRange(-100000, 100000);
+
+    displayAreaWidthSpin = new QSpinBox(this);
+    displayAreaWidthSpin->setRange(0, 10000);
+
+    displayAreaHeightSpin = new QSpinBox(this);
+    displayAreaHeightSpin->setRange(0, 10000);
+
+    layout->addWidget(new QLabel("Display Area left"), row, 0);
+    layout->addWidget(displayAreaLeftSpin, row++, 1);
+
+    layout->addWidget(new QLabel("Display Area top"), row, 0);
+    layout->addWidget(displayAreaTopSpin, row++, 1);
+
+    layout->addWidget(new QLabel("Display Area width"), row, 0);
+    layout->addWidget(displayAreaWidthSpin, row++, 1);
+
+    layout->addWidget(new QLabel("Display Area height"), row, 0);
+    layout->addWidget(displayAreaHeightSpin, row++, 1);
+
+    effectList = new QListWidget(this);
+    effectList->addItems(effectNameMap.keys());
+    effectList->setSelectionMode(QAbstractItemView::MultiSelection);
+    layout->addWidget(new QLabel("Effects"), row++, 0);
+    layout->addWidget(effectList, row, 0, 1, 2);
+
+    saveButton = new QPushButton("Save", this);
     connect(saveButton, &QPushButton::clicked, this, &ClipForm::onSaveClicked);
+    layout->addWidget(saveButton);
 }
 
 ClipForm::~ClipForm() {
@@ -47,18 +84,70 @@ ClipForm::~ClipForm() {
 }
 
 void ClipForm::setClip(Clip *clip) {
+    if (clip == currentClip) return;
     currentClip = clip;
-    if (currentClip != nullptr) {
-        filePathEdit->setText(currentClip->getFilePath());
-        startTimeSpin->setValue(currentClip->getStartTime());
-        offsetTimeSpin->setValue(currentClip->getOffsetTime());
-        durationSpin->setValue(currentClip->getDuration());
+
+    filePathEdit->setText(currentClip->getFilePath());
+
+    startTimeSpin->setValue(currentClip->getStartTime());
+    offsetTimeSpin->setValue(currentClip->getOffsetTime());
+    durationSpin->setValue(currentClip->getDuration());
+
+    bool hasDisplayArea = false;
+    QRect displayArea;
+
+    if (currentClip->getType() == ResourceType::Video) {
+        displayArea = dynamic_cast<VideoClip *>(currentClip)->getDisplayArea();
+        hasDisplayArea = true;
+    } else if (currentClip->getType() == ResourceType::Image) {
+        displayArea = dynamic_cast<ImageClip *>(currentClip)->getDisplayArea();
+        hasDisplayArea = true;
+    }
+
+    if (hasDisplayArea) {
+        displayAreaLeftSpin->show();
+        displayAreaTopSpin->show();
+        displayAreaWidthSpin->show();
+        displayAreaHeightSpin->show();
+
+        displayAreaLeftSpin->setValue(displayArea.left());
+        displayAreaTopSpin->setValue(displayArea.top());
+        displayAreaWidthSpin->setValue(displayArea.width());
+        displayAreaHeightSpin->setValue(displayArea.height());
     } else {
-        filePathEdit->clear();
-        startTimeSpin->setValue(0);
-        offsetTimeSpin->setValue(0);
-        durationSpin->setValue(0);
-        effectList->clearSelection();
+        displayAreaLeftSpin->hide();
+        displayAreaTopSpin->hide();
+        displayAreaWidthSpin->hide();
+        displayAreaHeightSpin->hide();
+    }
+
+    bool hasExternalEffect = false;
+    QList<MatEffect *> externalEffect;
+
+    if (currentClip->getType() == ResourceType::Video) {
+        externalEffect = dynamic_cast<VideoClip *>(currentClip)->getExternalEffect();
+        hasExternalEffect = true;
+    } else if (currentClip->getType() == ResourceType::Image) {
+        externalEffect = dynamic_cast<ImageClip *>(currentClip)->getExternalEffect();
+        hasExternalEffect = true;
+    }
+
+    if (hasExternalEffect) {
+        effectList->show();
+
+        for (int i = 0; i < effectList->count(); ++i) {
+            QString effectName = effectList->item(i)->text();
+            bool isSelected = false;
+            for (MatEffect* effect : externalEffect) {
+                if (effect->type() == effectNameMap[effectName]) {
+                    isSelected = true;
+                    break;
+                }
+            }
+            effectList->item(i)->setSelected(isSelected);
+        }
+    } else {
+        effectList->hide();
     }
 }
 
@@ -85,21 +174,43 @@ void ClipForm::applyToClip() {
     currentClip->setOffsetTime(offsetTimeSpin->value());
     currentClip->setDuration(durationSpin->value());
 
-    QList<MatEffect *> effects;
-    for (int i = 0; i < effectList->count(); ++i) {
-        if (effectList->item(i)->isSelected()) {
-            QString effectName = effectList->item(i)->text();
-            if (effectName == "Grayscale") {
-                effects.append(new GrayscaleEffect());
-            } else if (effectName == "Binarize") {
-                effects.append(new BinarizeEffect(128));
-            } else if (effectName == "Mean Filter") {
-                effects.append(new MeanFilterEffect());
-            } else if (effectName == "Gamma Correction") {
-                effects.append(new GammaCorrectionEffect(1.0));
-            } else if (effectName == "Edge Detection") {
-                effects.append(new EdgeDetectionEffect());
+    bool hasDisplayArea = false;
+    bool hasExternalEffect = false;
+    if (currentClip->getType() == ResourceType::Video) {
+        hasDisplayArea = true;
+        hasExternalEffect = true;
+    } else if (currentClip->getType() == ResourceType::Image) {
+        hasDisplayArea = true;
+        hasExternalEffect = true;
+    }
+
+    if (hasDisplayArea) {
+        QRect displayArea(
+            displayAreaLeftSpin->value(),
+            displayAreaTopSpin->value(),
+            displayAreaWidthSpin->value(),
+            displayAreaHeightSpin->value()
+        );
+
+        if (currentClip->getType() == ResourceType::Video) {
+            dynamic_cast<VideoClip *>(currentClip)->setDisplayArea(displayArea);
+        } else if (currentClip->getType() == ResourceType::Image) {
+            dynamic_cast<ImageClip *>(currentClip)->setDisplayArea(displayArea);
+        }
+    }
+
+    if (hasExternalEffect) {
+        QList<MatEffect *> effects;
+        for (int i = 0; i < effectList->count(); ++i) {
+            if (effectList->item(i)->isSelected()) {
+                QString effectName = effectList->item(i)->text();
+                effects.append(EffectFactory::createEffect(effectNameMap[effectName]));
             }
+        }
+        if (currentClip->getType() == ResourceType::Video) {
+            dynamic_cast<VideoClip *>(currentClip)->setExternalEffect(effects);
+        } else if (currentClip->getType() == ResourceType::Image) {
+            dynamic_cast<ImageClip *>(currentClip)->setExternalEffect(effects);
         }
     }
 

@@ -15,7 +15,7 @@ cv::Mat BinarizeEffect::apply(const cv::Mat &image) const {
 
 cv::Mat MeanFilterEffect::apply(const cv::Mat &image) const {
     cv::Mat result;
-    cv::blur(image, result, cv::Size(3, 3));
+    cv::blur(image, result, cv::Size(kernelSize_, kernelSize_));
     return result;
 }
 
