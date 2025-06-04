@@ -1,5 +1,5 @@
 #include "fileviewer.h"
-#include "ui_FileViewer.h"
+#include "ui_fileviewer.h"
 #include <QDir>
 #include <QFileInfo>
 #include <QTreeWidgetItem>
