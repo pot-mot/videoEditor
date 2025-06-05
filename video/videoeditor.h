@@ -30,6 +30,12 @@ public:
         return 0;
     }
 
+    void setFPS(double newFPS) {
+        fps = newFPS;
+        interval = 1000.0 / fps;
+        playTimer->setInterval(interval);
+    }
+
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
@@ -39,6 +45,8 @@ private:
     void initUI();
 
     double fps;
+    double interval;
+
     int width;
     int height;
 

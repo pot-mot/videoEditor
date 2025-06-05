@@ -21,7 +21,7 @@ VideoEditor::VideoEditor(QWidget *parent)
     : QMainWindow(parent)
       , ui(new Ui::VideoEditor) {
     ui->setupUi(this);
-    fps = 30;
+    setFPS(30);
     width = 1280;
     height = 720;
     initUI(); // 调用初始化函数
@@ -132,14 +132,12 @@ void VideoEditor::initUI() {
         isPlaying = !isPlaying;
     });
 
-    double interval = 1000 / fps;
-    playTimer->setInterval(interval);
-    connect(playTimer, &QTimer::timeout, this, [this, playPauseButton, interval]() {
+    connect(playTimer, &QTimer::timeout, this, [this, playPauseButton]() {
         int currentValue = mainTimeline->value();
         int maxValue = mainTimeline->maximum();
 
         if (currentValue < maxValue) {
-            mainTimeline->setValue(static_cast<int>(currentValue + interval * this->playSpeed));
+            mainTimeline->setValue(static_cast<int>(currentValue + interval * playSpeed));
         } else {
             playTimer->stop();
             isPlaying = false;
@@ -151,7 +149,7 @@ void VideoEditor::initUI() {
     QPushButton *rewindButton = new QPushButton("<<", this);
     rewindButton->setFixedWidth(32);
     connect(rewindButton, &QPushButton::clicked, this, [this]() {
-        int newValue = qMax(0, mainTimeline->value() - 200);
+        int newValue = qMax(0, mainTimeline->value() - static_cast<int>(interval));
         mainTimeline->setValue(newValue);
     });
 
@@ -159,7 +157,7 @@ void VideoEditor::initUI() {
     QPushButton *forwardButton = new QPushButton(">>", this);
     forwardButton->setFixedWidth(32);
     connect(forwardButton, &QPushButton::clicked, this, [this]() {
-        int newValue = qMin(mainTimeline->maximum(), mainTimeline->value() + 200);
+        int newValue = qMin(mainTimeline->maximum(), mainTimeline->value() + static_cast<int>(interval));
         mainTimeline->setValue(newValue);
     });
 
