@@ -1,8 +1,23 @@
 cmake_minimum_required(VERSION 3.19)
+
+#set(CMAKE_TOOLCHAIN_FILE "D:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake")
+
+set(Tesseract_DIR "D:/dev/vcpkg/installed/x64-windows-static/share/tesseract")
+
+#set(CURL_INCLUDE_DIR "D:/dev/vcpkg/installed/x64-windows/include")
+#set(CURL_LIBRARY_RELEASE "D:/dev/vcpkg/installed/x64-windows/lib/libcurl.lib")
+#set(Leptonica_DIR "D:/dev/vcpkg/installed/x64-windows/share/leptonica")
+#set(OpenJPEG_DIR "D:/dev/vcpkg/installed/x64-windows/share/openjpeg")
+#set(WebP_DIR "D:/dev/vcpkg/installed/x64-windows/share/webp")
+#set(LibArchive_INCLUDE_DIR "D:/dev/vcpkg/installed/x64-windows/include")
+#set(LibArchive_LIBRARY "D:/dev/vcpkg/installed/x64-windows/lib/libarchive.lib")
+
 project(videoEditor LANGUAGES CXX)
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets Multimedia MultimediaWidgets)
 find_package(OpenCV REQUIRED)
+
+find_package(Tesseract CONFIG REQUIRED)
 
 qt_standard_project_setup()
 
@@ -55,11 +70,15 @@ qt_add_executable(videoEditor
 
         icon.qrc
         icon.rc
+
+        image/imageocr.cpp
+        image/imageocr.h
 )
 
 target_include_directories(videoEditor
         PRIVATE
         ${OpenCV_INCLUDE_DIRS}
+        ${TESSERACT_INCLUDE_DIR}
 )
 
 target_link_libraries(videoEditor
@@ -69,6 +88,7 @@ target_link_libraries(videoEditor
         Qt::Multimedia
         Qt::MultimediaWidgets
         ${OpenCV_LIBS}
+        Tesseract::libtesseract
 )
 
 include(GNUInstallDirs)

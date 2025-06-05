@@ -11,6 +11,8 @@
 #include <QImage>
 #include <QScrollArea>
 #include <QScroller>
+
+#include "imageocr.h"
 #include "imageprocessor.h"
 
 ImageEditor::ImageEditor(QWidget *parent)
@@ -98,6 +100,12 @@ void ImageEditor::initUI() {
         this->setImage(ImageProcessor::edgeDetection(this->currentImage));
     });
     toolBar->addAction(edgeDetectionAction);
+
+    QAction* ocrAction = new QAction(tr("文字识别"), this);
+    connect(ocrAction, &QAction::triggered, this, [this]() {
+         QMessageBox::information(this, tr("识别结果"), ImageOCR::getText(this->currentImage));
+    });
+    toolBar->addAction(ocrAction);
 }
 
 void ImageEditor::openImage() {
