@@ -7,8 +7,9 @@
 #include "videotimeline.h"
 #include "ui_videotimeline.h"
 #include "videotimelinetrack.h"
+#include "../videoeditor.h"
 
-VideoTimeline::VideoTimeline(QWidget *parent) : QWidget(parent), ui(new Ui::VideoTimeline) {
+VideoTimeline::VideoTimeline(VideoEditor* editor) : QWidget(editor), editor(editor), ui(new Ui::VideoTimeline) {
     ui->setupUi(this);
 
     horizontalScrollBar = new QScrollBar(Qt::Horizontal, this);
@@ -80,4 +81,8 @@ void VideoTimeline::resizeEvent(QResizeEvent *event) {
     verticalScrollBar->setGeometry(width() - verticalScrollBar->width(), 0, verticalScrollBar->width(), height());
 
     track->setGeometry(0, 0, width() - verticalScrollBar->width(), height() - horizontalScrollBar->height());
+}
+
+int VideoTimeline::getCurrentTime() const {
+    return editor->getCurrentTime();
 }

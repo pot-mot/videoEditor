@@ -10,6 +10,7 @@
 #include "../clip/ClipBase.h"  // 引入基类 Clip
 
 class VideoTimelineTrack;
+class VideoEditor;
 QT_BEGIN_NAMESPACE
 
 namespace Ui {
@@ -22,7 +23,7 @@ class VideoTimeline : public QWidget {
     Q_OBJECT
 
 public:
-    explicit VideoTimeline(QWidget *parent = nullptr);
+    explicit VideoTimeline(VideoEditor* editor);
 
     ~VideoTimeline() override;
 
@@ -53,6 +54,7 @@ public:
     QScrollBar *getHorizontalScrollBar() const { return horizontalScrollBar; }
     QScrollBar *getVerticalScrollBar() const { return verticalScrollBar; }
 
+    int getCurrentTime() const;
 signals:
     void totalDurationChange(int duration);
 
@@ -65,6 +67,8 @@ protected:
     void resizeEvent(QResizeEvent *event) override; // 尺寸变化事件
 
 private:
+    VideoEditor *editor;
+
     Ui::VideoTimeline *ui;
     QList<Clip *> clips; // 存储所有 clip 数据
 

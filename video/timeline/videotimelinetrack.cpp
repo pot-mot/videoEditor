@@ -94,6 +94,13 @@ void VideoTimelineTrack::paintEvent(QPaintEvent *event) {
         painter.drawText(rect, Qt::AlignCenter, clip->getFilePath());
         y += trackHeight + trackGap;
     }
+
+    int currentTime = timeline->getCurrentTime();
+    double currentTimeX = currentTime * scale + scrollLeft;
+    QPen currentTimePen("#1E90FF");
+    currentTimePen.setWidth(2);
+    painter.setPen(currentTimePen);
+    painter.drawLine(currentTimeX, 0, currentTimeX, height());
 }
 
 void VideoTimelineTrack::mousePressEvent(QMouseEvent *event) {

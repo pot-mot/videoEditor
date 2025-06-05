@@ -110,7 +110,7 @@ ClipForm::ClipForm(QWidget *parent): QWidget(parent), ui(new Ui::ClipForm) {
 
     saveButton = new QPushButton("Save", this);
     connect(saveButton, &QPushButton::clicked, this, &ClipForm::onSaveClicked);
-    layout->addWidget(saveButton);
+    layout->addWidget(saveButton, 5, 0, 1, 2);
     saveButton->hide();
 }
 

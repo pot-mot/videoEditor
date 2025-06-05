@@ -24,6 +24,12 @@ public:
     explicit VideoEditor(QWidget *parent = nullptr);
     ~VideoEditor();
 
+    int getCurrentTime() const {
+        if (mainTimeline)
+            return mainTimeline->value();
+        return 0;
+    }
+
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
