@@ -45,8 +45,8 @@ ClipForm::ClipForm(QWidget *parent): QWidget(parent), ui(new Ui::ClipForm) {
     baseConfigLayout->addWidget(new QLabel("Offset Time"), 3, 0);
     baseConfigLayout->addWidget(offsetTimeSpin, 3, 1);
 
-    baseConfigLayout->addWidget(new QLabel("Duration"), 3, 0);
-    baseConfigLayout->addWidget(durationSpin, 3, 1);
+    baseConfigLayout->addWidget(new QLabel("Duration"), 4, 0);
+    baseConfigLayout->addWidget(durationSpin, 4, 1);
 
     layout->addWidget(baseConfig, 2, 0, 1, 2);
     baseConfig->hide();
