@@ -52,6 +52,9 @@ qt_add_executable(videoEditor
         video/clip/form/ClipForm.cpp
         video/clip/form/ClipForm.h
         video/clip/form/ClipForm.ui
+
+        icon.qrc
+        icon.rc
 )
 
 target_include_directories(videoEditor
@@ -75,6 +78,14 @@ install(TARGETS videoEditor
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
+
+if(WIN32)
+    # 创建Windows图标资源文件
+    configure_file(icon.rc @ONLY)
+    set(WIN32_RESOURCE_FILES icon.rc)
+else()
+    set(WIN32_RESOURCE_FILES "")
+endif()
 
 qt_generate_deploy_app_script(
         TARGET videoEditor
