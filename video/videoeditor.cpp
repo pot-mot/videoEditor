@@ -41,7 +41,7 @@ void VideoEditor::initUI() {
     QWidget *leftContainer = new QWidget(this);
     QVBoxLayout *leftLayout = new QVBoxLayout(leftContainer);
     fileResourceTree = new FileViewer(this);
-    fileResourceTree->typeFilters = {"mp4", "png", "jpg", "mp3"};
+    fileResourceTree->typeFilters = {"mp4", "png", "jpg", "jpeg"};
     connect(fileResourceTree, &FileViewer::fileSelected, this, [this](const QString &filePath) {
         QFileInfo fileInfo(filePath);
         QString suffix = fileInfo.suffix().toLower();
@@ -66,7 +66,7 @@ void VideoEditor::initUI() {
                 }
             });
             player->setSource(QUrl::fromLocalFile(filePath));
-        } else if (suffix == "png" || suffix == "jpg") {
+        } else if (suffix == "png" || suffix == "jpg" || suffix == "jpeg") {
             Clip *clip = new ImageClip(filePath, 0, 0, 5000, cv::Rect(0, 0, width, height), {});
             if (clip != nullptr) {
                 qDebug() << "Added clip:" << filePath;
