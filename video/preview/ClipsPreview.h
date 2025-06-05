@@ -27,7 +27,6 @@ public:
     static cv::Mat preview(
         QList<Clip *> clips,
         int currentTime,
-        double fps,
         const cv::Rect &frameRect
     );
 };

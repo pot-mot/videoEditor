@@ -32,7 +32,7 @@ void VideoRender::render(const cv::String &outputPath, QList<Clip *> clips, int 
 
     // 逐帧处理
     for (int timeMs = 0; timeMs < totalDuration; timeMs += frameStep) {
-        cv::Mat frame = ClipsPreview::preview(clips, timeMs, fps, frameRect);
+        cv::Mat frame = ClipsPreview::preview(clips, timeMs, frameRect);
 
         writer.write(frame);
 

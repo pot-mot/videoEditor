@@ -1,7 +1,8 @@
 #include "VideoClip.h"
 #include <opencv2/opencv.hpp>
+#include <QDebug>
 
-cv::Mat VideoClip::getFrameAtTime(int timeMs, double fps) const {
+cv::Mat VideoClip::getFrameAtTime(int timeMs) const {
     if (timeMs < 0 || timeMs >= duration) {
         return cv::Mat(); // 返回空矩阵表示无效时间
     }
@@ -11,8 +12,9 @@ cv::Mat VideoClip::getFrameAtTime(int timeMs, double fps) const {
         return cv::Mat();
     }
 
-    int frameNumber = static_cast<int>(fps * timeMs / 1000.0);
-    
+    double fps = cap.get(cv::CAP_PROP_FPS);
+    int frameNumber = static_cast<int>(timeMs * fps / 1000.0);
+
     cap.set(cv::CAP_PROP_POS_FRAMES, frameNumber);
     
     cv::Mat frame;

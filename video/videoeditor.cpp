@@ -237,7 +237,6 @@ void VideoEditor::preview() {
         ClipsPreview::preview(
             sliceTimeline->getClips(),
             mainTimeline->value(),
-            fps,
             cv::Rect(0, 0, width, height)
         )
     );

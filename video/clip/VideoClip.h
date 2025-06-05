@@ -37,7 +37,7 @@ public:
     }
 
     // 新增方法声明：获取指定时间点的视频帧
-    cv::Mat getFrameAtTime(int timeMs, double fps) const;
+    cv::Mat getFrameAtTime(int timeMs) const;
 
 private:
     int maxDuration;            // 最长时长

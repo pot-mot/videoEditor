@@ -7,7 +7,7 @@
 #include <QPainter>
 #include <opencv2/imgproc.hpp>
 
-cv::Mat ClipsPreview::preview(QList<Clip *> clips, int currentTime, double fps, const cv::Rect &frameRect) {
+cv::Mat ClipsPreview::preview(QList<Clip *> clips, int currentTime, const cv::Rect &frameRect) {
     cv::Mat frame = cv::Mat::zeros(frameRect.height, frameRect.width, CV_8UC3);
 
     for (const auto &clip: clips) {
@@ -16,7 +16,7 @@ cv::Mat ClipsPreview::preview(QList<Clip *> clips, int currentTime, double fps, 
                 case ResourceType::Video: {
                     VideoClip *videoClip = static_cast<VideoClip *>(clip);
 
-                    cv::Mat videoFrame = videoClip->getFrameAtTime(currentTime - clip->getStartTime(), fps);
+                    cv::Mat videoFrame = videoClip->getFrameAtTime(currentTime - clip->getStartTime());
                     if (videoFrame.empty()) {
                         break;
                     }
