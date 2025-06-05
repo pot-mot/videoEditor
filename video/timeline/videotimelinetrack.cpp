@@ -10,6 +10,7 @@
 
 VideoTimelineTrack::VideoTimelineTrack(VideoTimeline *parent) : QWidget(parent), ui(new Ui::VideoTimelineTrack) {
     ui->setupUi(this);
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 VideoTimelineTrack::~VideoTimelineTrack() {
@@ -125,7 +126,7 @@ void VideoTimelineTrack::mousePressEvent(QMouseEvent *event) {
                 int rightEdge = clipRectX + clipRectWidth;
                 if (std::abs(event->position().x() - leftEdge) < 20) {
                     dragMode = ResizeLeft;
-                } else if (std::abs(event->position().x()- rightEdge) < 20) {
+                } else if (std::abs(event->position().x() - rightEdge) < 20) {
                     dragMode = ResizeRight;
                 } else {
                     dragMode = Move;
@@ -181,5 +182,35 @@ void VideoTimelineTrack::mouseReleaseEvent(QMouseEvent *event) {
         draggedClip = nullptr;
         dragMode = None;
         update();
+    }
+}
+
+void VideoTimelineTrack::keyPressEvent(QKeyEvent *event) {
+    VideoTimeline *timeline = getTimeline();
+    if (!timeline) return;
+    if (selectedClip == nullptr) return;
+    QList<Clip *> clips = timeline->getClips();
+    if (clips.length() == 0) return;
+    int index = clips.indexOf(selectedClip);
+    if (index == -1) return;
+
+    switch (event->key()) {
+        case Qt::Key_Up: {
+            if (index == 0) break;
+            timeline->moveClip(index, index - 1);
+            break;
+        }
+        case Qt::Key_Down: {
+            if (index == clips.length() - 1) break;
+            timeline->moveClip(index, index + 1);
+            break;
+        }
+        case Qt::Key_Delete: {
+            timeline->removeClip(index);
+            update();
+            break;
+        }
+        default:
+            QWidget::keyPressEvent(event);
     }
 }

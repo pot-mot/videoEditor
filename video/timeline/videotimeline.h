@@ -30,6 +30,8 @@ public:
 
     void removeClip(int index);
 
+    void moveClip(int index, int newIndex);
+
     QList<Clip *> getClips() const { return clips; }
 
     void setTotalDuration(int duration) {

@@ -12,6 +12,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QScrollBar>
+#include <QKeyEvent>
 
 #include "videotimeline.h"
 #include "../clip/ClipBase.h"  // 引入基类 Clip
@@ -39,6 +40,7 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;   // 鼠标按下事件
     void mouseMoveEvent(QMouseEvent *event) override;    // 鼠标移动事件
     void mouseReleaseEvent(QMouseEvent *event) override; // 鼠标释放事件
+    void keyPressEvent(QKeyEvent *event) override;
 
 private:
     Ui::VideoTimelineTrack *ui;

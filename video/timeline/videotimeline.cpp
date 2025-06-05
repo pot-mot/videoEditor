@@ -60,6 +60,16 @@ void VideoTimeline::removeClip(int index) {
     }
 }
 
+void VideoTimeline::moveClip(int index, int newIndex) {
+    if (index >= 0 && index < clips.size() && newIndex >= 0 && newIndex < clips.size()) {
+        emit this->beforeClipChange();
+        Clip *clip = clips.takeAt(index);
+        clips.insert(newIndex, clip);
+        update();
+        emit this->clipChanged();
+    }
+}
+
 void VideoTimeline::resizeEvent(QResizeEvent *event) {
     QWidget::resizeEvent(event);
 

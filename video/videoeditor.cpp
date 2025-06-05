@@ -173,11 +173,17 @@ void VideoEditor::initUI() {
         mainTimeline->setMaximum(duration);
     });
     connect(sliceTimeline, &VideoTimeline::clipChanged, this, [this]() {
+        if (!this->sliceTimeline->getClips().contains(selectedClip)) {
+            this->selectedClip = nullptr;
+            this->clipForm->setClip(nullptr);
+        }
         this->preview();
     });
     connect(sliceTimeline, &VideoTimeline::clipSelected, this, [this](Clip *clip) {
-        this->selectedClip = clip;
-        this->clipForm->setClip(clip);
+        if (this->sliceTimeline->getClips().contains(clip)) {
+            this->selectedClip = clip;
+            this->clipForm->setClip(clip);
+        }
     });
     QSpinBox *scaleSpinBox = new QSpinBox(this);
     scaleSpinBox->setRange(1, 50000);
