@@ -49,10 +49,12 @@ private:
 
     QGridLayout* layout;
 
-    QPushButton *browseButton;
     QPushButton *saveButton;
 
     QLineEdit* filePathEdit;
+    QPushButton *browseButton;
+
+    QWidget* baseConfig;
     QSpinBox* startTimeSpin;
     QSpinBox* offsetTimeSpin;
     QSpinBox* durationSpin;

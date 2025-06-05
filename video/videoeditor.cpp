@@ -183,6 +183,9 @@ void VideoEditor::initUI() {
         if (this->sliceTimeline->getClips().contains(clip)) {
             this->selectedClip = clip;
             this->clipForm->setClip(clip);
+        } else {
+            this->selectedClip = nullptr;
+            this->clipForm->setClip(nullptr);
         }
     });
     QSpinBox *scaleSpinBox = new QSpinBox(this);

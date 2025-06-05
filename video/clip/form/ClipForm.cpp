@@ -17,32 +17,39 @@ ClipForm::ClipForm(QWidget *parent): QWidget(parent), ui(new Ui::ClipForm) {
     layout->setColumnStretch(1, 3);
     setLayout(layout);
 
-    int row = 0;
+    baseConfig = new QWidget(this);
+    QGridLayout *baseConfigLayout = new QGridLayout(baseConfig);
+    baseConfig->setLayout(baseConfigLayout);
+    baseConfigLayout->setColumnStretch(0, 1);
+    baseConfigLayout->setColumnStretch(1, 3);
 
-    filePathEdit = new QLineEdit(this);
-    browseButton = new QPushButton("Browse", this);
+    filePathEdit = new QLineEdit(baseConfig);
+    browseButton = new QPushButton("Browse", baseConfig);
     connect(browseButton, &QPushButton::clicked, this, &ClipForm::onBrowseClicked);
 
-    startTimeSpin = new QSpinBox(this);
+    baseConfigLayout->addWidget(filePathEdit, 0, 0, 1, 2);
+    baseConfigLayout->addWidget(browseButton, 1, 0);
+
+    startTimeSpin = new QSpinBox(baseConfig);
     startTimeSpin->setRange(-1000000, 1000000);
 
-    offsetTimeSpin = new QSpinBox(this);
+    offsetTimeSpin = new QSpinBox(baseConfig);
     offsetTimeSpin->setRange(0, 1000000);
 
-    durationSpin = new QSpinBox(this);
+    durationSpin = new QSpinBox(baseConfig);
     durationSpin->setRange(0, 1000000);
 
-    layout->addWidget(filePathEdit, row++, 0, 1, 2);
-    layout->addWidget(browseButton, row++, 0);
+    baseConfigLayout->addWidget(new QLabel("Start Time"), 2, 0);
+    baseConfigLayout->addWidget(startTimeSpin, 2, 1);
 
-    layout->addWidget(new QLabel("Start Time"), row, 0);
-    layout->addWidget(startTimeSpin, row++, 1);
+    baseConfigLayout->addWidget(new QLabel("Offset Time"), 3, 0);
+    baseConfigLayout->addWidget(offsetTimeSpin, 3, 1);
 
-    layout->addWidget(new QLabel("Offset Time"), row, 0);
-    layout->addWidget(offsetTimeSpin, row++, 1);
+    baseConfigLayout->addWidget(new QLabel("Duration"), 3, 0);
+    baseConfigLayout->addWidget(durationSpin, 3, 1);
 
-    layout->addWidget(new QLabel("Duration"), row, 0);
-    layout->addWidget(durationSpin, row++, 1);
+    layout->addWidget(baseConfig, 2, 0, 1, 2);
+    baseConfig->hide();
 
     displayAreaConfig = new QWidget(this);
     QGridLayout *displayAreaConfigLayout = new QGridLayout(displayAreaConfig);
@@ -74,7 +81,7 @@ ClipForm::ClipForm(QWidget *parent): QWidget(parent), ui(new Ui::ClipForm) {
     displayAreaConfigLayout->addWidget(new QLabel("Display Area height"), 3, 0);
     displayAreaConfigLayout->addWidget(displayAreaHeightSpin, 3, 1);
 
-    layout->addWidget(displayAreaConfig, row++, 0, 1, 2);
+    layout->addWidget(displayAreaConfig, 3, 0, 1, 2);
     displayAreaConfig->hide();
 
 
@@ -98,12 +105,13 @@ ClipForm::ClipForm(QWidget *parent): QWidget(parent), ui(new Ui::ClipForm) {
     effectConfigLayout->addWidget(new QLabel("Selected Effects"), 3, 0);
     effectConfigLayout->addWidget(selectedEffectList, 4, 0);
 
-    layout->addWidget(effectConfig, row, 0, 1, 2);
+    layout->addWidget(effectConfig, 4, 0, 1, 2);
     effectConfig->hide();
 
     saveButton = new QPushButton("Save", this);
     connect(saveButton, &QPushButton::clicked, this, &ClipForm::onSaveClicked);
     layout->addWidget(saveButton);
+    saveButton->hide();
 }
 
 ClipForm::~ClipForm() {
@@ -113,21 +121,23 @@ ClipForm::~ClipForm() {
 void ClipForm::setClip(Clip *clip) {
     currentClip = clip;
     if (currentClip == nullptr) {
-        filePathEdit->setText("");
-
-        startTimeSpin->setValue(0);
-        offsetTimeSpin->setValue(0);
-        durationSpin->setValue(0);
+        baseConfig->hide();
 
         displayAreaConfig->hide();
 
         effectConfig->hide();
+
+        saveButton->hide();
     } else {
         filePathEdit->setText(currentClip->getFilePath());
 
         startTimeSpin->setValue(currentClip->getStartTime());
         offsetTimeSpin->setValue(currentClip->getOffsetTime());
         durationSpin->setValue(currentClip->getDuration());
+
+        baseConfig->show();
+
+        saveButton->show();
 
         bool hasDisplayArea = false;
         cv::Rect displayArea;
