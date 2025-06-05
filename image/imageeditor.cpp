@@ -101,7 +101,7 @@ void ImageEditor::initUI() {
 }
 
 void ImageEditor::openImage() {
-    QString imagePath = QFileDialog::getOpenFileName(this, tr("打开图片"), "", tr("Image Files (*.png *.jpg *.bmp)"));
+    QString imagePath = QFileDialog::getOpenFileName(this, tr("打开图片"), "", tr("Image Files (*.png *.jpg *.jpeg)"));
     if (!imagePath.isEmpty()) {
         this->originImage = QImage(imagePath);
         this->currentImage = this->originImage;
