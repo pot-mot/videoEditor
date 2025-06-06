@@ -3,12 +3,11 @@
 #include "../clip/VideoClip.h"
 #include "../clip/ImageClip.h"
 #include "../clip/TextClip.h"
-#include "../../utils/MatImageConvert.h"
 #include <QPainter>
 #include <opencv2/imgproc.hpp>
 
 cv::Mat ClipsPreview::preview(QList<Clip *> clips, int currentTime, const cv::Rect &frameRect) {
-    cv::Mat frame = cv::Mat::zeros(frameRect.height, frameRect.width, CV_8UC3);
+    cv::Mat frame = cv::Mat::zeros(frameRect.height, frameRect.width, CV_8UC4);
 
     for (const auto &clip: clips) {
         if (currentTime >= clip->getStartTime() && currentTime < clip->getStartTime() + clip->getDuration()) {
@@ -72,11 +71,6 @@ void ClipsPreview::drawResizedImageToFrame(
     cv::Mat resizedFrame;
     cv::resize(image, resizedFrame, cv::Size(displayArea.width, displayArea.height));
 
-    // 确保 resizedFrame 是 3 通道 BGR 图像
-    if (resizedFrame.channels() != 3) {
-        cv::cvtColor(resizedFrame, resizedFrame, cv::COLOR_BGRA2BGR);
-    }
-
     // 计算 resizedFrame 上的有效区域（对应于 safeRoi 在 roi 中的位置）
     int srcX = safeArea.x - displayArea.x;
     int srcY = safeArea.y - displayArea.y;
@@ -90,8 +84,31 @@ void ClipsPreview::drawResizedImageToFrame(
         // 提取有效区域
         cv::Mat validRegion = resizedFrame(srcRect);
 
-        // 复制到 frame 的安全区域
-        validRegion.copyTo(frame(safeArea));
+        switch (validRegion.type()) {
+            case CV_8UC4: {
+                validRegion.copyTo(frame(safeArea));
+            }
+
+            case CV_8UC1: {
+                // 灰度图 → BGRA
+                cv::Mat bgr, bgra;
+                cv::cvtColor(validRegion, bgr, cv::COLOR_GRAY2BGR);
+                cv::cvtColor(bgr, bgra, cv::COLOR_BGR2BGRA);
+                bgra.copyTo(frame(safeArea));
+                break;
+            }
+
+            case CV_8UC3: {
+                // BGR → BGRA（不透明）
+                cv::Mat bgra;
+                cv::cvtColor(validRegion, bgra, cv::COLOR_BGR2BGRA);
+                bgra.copyTo(frame(safeArea));
+                break;
+            }
+
+            default:
+                break;
+        }
 
         validRegion.release();
     }

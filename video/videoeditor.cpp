@@ -233,14 +233,20 @@ void VideoEditor::resizeEvent(QResizeEvent *event) {
 }
 
 void VideoEditor::preview() {
-    QImage result = MatImageConvert::toImage(
-        ClipsPreview::preview(
-            sliceTimeline->getClips(),
-            mainTimeline->value(),
-            cv::Rect(0, 0, width, height)
-        )
+    cv::Mat bgra = ClipsPreview::preview(
+        sliceTimeline->getClips(),
+        mainTimeline->value(),
+        cv::Rect(0, 0, width, height)
     );
+    cv::Mat bgr;
+
+    cv::cvtColor(bgra, bgr, cv::COLOR_BGRA2BGR);
+
+
+    QImage result = MatImageConvert::toImage(bgr);
+
     QPixmap pixmap = QPixmap::fromImage(result);
+
     videoPreview->setPixmap(
         pixmap.scaled(
             videoPreview->width(),
