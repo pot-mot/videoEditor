@@ -1,7 +1,12 @@
 #ifndef EFFECTBASE_H
 #define EFFECTBASE_H
 
+#include <QLabel>
 #include <qmap.h>
+#include <QSlider>
+#include <qspinbox.h>
+#include <QVBoxLayout>
+#include <QWidget>
 #include <opencv2/opencv.hpp>
 
 enum class MatEffectType {
@@ -11,6 +16,8 @@ enum class MatEffectType {
     GammaCorrection,
     EdgeDetection,
     FeatureDetection,
+    Opacity,
+    Rotate
 };
 
 // 定义效果基类
@@ -36,6 +43,8 @@ static QMap<QString, MatEffectType> effectNameMap = {
     {"Grayscale", MatEffectType::Grayscale},
     {"Binarize", MatEffectType::Binarize},
     {"Mean Filter", MatEffectType::MeanFilter},
+    {"Opacity", MatEffectType::Opacity},
+    {"Rotate", MatEffectType::Rotate},
     {"Gamma Correction", MatEffectType::GammaCorrection},
     {"Edge Detection", MatEffectType::EdgeDetection},
     {"Feature Detection", MatEffectType::FeatureDetection}
@@ -45,6 +54,8 @@ static QMap<MatEffectType, QString> effectTypeMap = {
     {MatEffectType::Grayscale, "Grayscale"},
     {MatEffectType::Binarize, "Binarize"},
     {MatEffectType::MeanFilter, "Mean Filter"},
+    {MatEffectType::Opacity, "Opacity"},
+    {MatEffectType::Rotate, "Rotate"},
     {MatEffectType::GammaCorrection, "Gamma Correction"},
     {MatEffectType::EdgeDetection, "Edge Detection"},
     {MatEffectType::FeatureDetection, "Feature Detection"}
@@ -124,6 +135,29 @@ public:
     bool isExclusive() const override { return true; }
 };
 
+class OpacityEffect : public MatEffect {
+public:
+    OpacityEffect(double opacity = 0.5) : MatEffect(MatEffectType::Opacity), opacity_(opacity) {
+    }
+
+    cv::Mat apply(const cv::Mat &image) const override;
+
+private:
+    double opacity_;
+};
+
+class RotateEffect : public MatEffect {
+public:
+    RotateEffect(int degree = 45) : MatEffect(MatEffectType::Rotate), degree_(degree) {
+
+    }
+
+    cv::Mat apply(const cv::Mat &image) const override;
+
+private:
+    int degree_;
+};
+
 class EffectFactory {
 public:
     static MatEffect *createEffect(MatEffectType type) {
@@ -131,6 +165,8 @@ public:
             case MatEffectType::Grayscale: return new GrayscaleEffect();
             case MatEffectType::Binarize: return new BinarizeEffect();
             case MatEffectType::MeanFilter: return new MeanFilterEffect();
+            case MatEffectType::Opacity: return new OpacityEffect();
+            case MatEffectType::Rotate: return new RotateEffect();
             case MatEffectType::GammaCorrection: return new GammaCorrectionEffect();
             case MatEffectType::EdgeDetection: return new EdgeDetectionEffect();
             case MatEffectType::FeatureDetection: return new FeatureDetectionEffect();
