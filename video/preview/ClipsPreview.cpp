@@ -86,7 +86,8 @@ void ClipsPreview::drawResizedImageToFrame(
 
         switch (validRegion.type()) {
             case CV_8UC4: {
-                validRegion.copyTo(frame(safeArea));
+                cv::addWeighted(frame(safeArea), 0.5, validRegion, 0.5, 0.0, frame(safeArea));
+                break;
             }
 
             case CV_8UC1: {
