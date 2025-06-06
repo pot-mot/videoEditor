@@ -86,7 +86,27 @@ void ClipsPreview::drawResizedImageToFrame(
 
         switch (validRegion.type()) {
             case CV_8UC4: {
-                cv::addWeighted(frame(safeArea), 0.5, validRegion, 0.5, 0.0, frame(safeArea));
+                for (int y = 0; y < validRegion.rows; ++y) {
+                    for (int x = 0; x < validRegion.cols; ++x) {
+                        cv::Vec4b pixel = validRegion.at<cv::Vec4b>(y, x);
+                        uchar alpha = pixel[3];
+
+                        if (alpha == 0) {
+                            // 完全透明：不做任何操作，保留原图
+                            continue;
+                        } else if (alpha == 255) {
+                            // 完全不透明：直接覆盖
+                            frame(safeArea).at<cv::Vec4b>(y, x) = pixel;
+                        } else {
+                            // 半透明：执行 alpha blending 叠加
+                            cv::Vec4b &dst = frame(safeArea).at<cv::Vec4b>(y, x);
+                            dst[0] = (uchar)((pixel[0] * alpha + dst[0] * (255 - alpha)) >> 8); // B
+                            dst[1] = (uchar)((pixel[1] * alpha + dst[1] * (255 - alpha)) >> 8); // G
+                            dst[2] = (uchar)((pixel[2] * alpha + dst[2] * (255 - alpha)) >> 8); // R
+                            dst[3] = (uchar)((pixel[3] + dst[3]) >> 1);                         // A (简单平均)
+                        }
+                    }
+                }
                 break;
             }
 
